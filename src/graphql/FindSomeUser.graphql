@@ -1,0 +1,6 @@
+query FindSomeUser($skipInput: Int!) {
+  findManyUser(pagination: { take: 1, skip: $skipInput }) {
+    id
+    username
+  }
+}

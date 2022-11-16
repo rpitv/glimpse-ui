@@ -3,6 +3,13 @@
     <h1 class="title">
       About
     </h1>
+
+
+    <hr>
+    <UserCarouselCard />
+    <hr>
+
+
     <p>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac orci vestibulum, fermentum lorem accumsan,
       aliquet turpis. Donec lectus diam, tincidunt ut eleifend et, dignissim at ipsum. Integer interdum luctus
@@ -50,6 +57,7 @@
 
 <script setup lang="ts">
 
+import UserCarouselCard from "@/components/UserCarouselCard.vue";
 </script>
 
 <style scoped lang="scss">
