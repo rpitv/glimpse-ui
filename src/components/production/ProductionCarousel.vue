@@ -1,5 +1,7 @@
 <template>
+<div class="aspect-ratio">
 
+</div>
 </template>
 
 <script setup lang="ts">
@@ -21,5 +23,8 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
-
+.aspect-ratio {
+  aspect-ratio: 16/9;
+  background: black;
+}
 </style>

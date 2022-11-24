@@ -57,6 +57,7 @@ const productionSubtitle = computed<string>(() => {
 }
 .card {
   width: 80%;
+  margin-bottom: 3em;
 }
 
 .prod-title, .prod-subtitle {
