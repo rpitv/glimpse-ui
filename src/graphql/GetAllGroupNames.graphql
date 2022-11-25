@@ -1,0 +1,6 @@
+query GetAllGroupNames($pagination: Pagination) {
+  GetAllGroupNames: findManyGroup(pagination: $pagination) {
+    id
+    name
+  }
+}

@@ -13,9 +13,15 @@
                 <n-input-number v-model:value="createGroupFormInput.priority"/>
               </n-form-item>
               <n-form-item label="Parent" path="parent">
-                <n-input-number v-model:value="createGroupFormInput.parent"/>
+                <n-select clearable :options="parentOptions" v-model:value="createGroupFormInput.parent" @scroll="parentSelectScrolled"/>
               </n-form-item>
             </n-form>
+            <template #action>
+              <div class="create-action-buttons">
+                <n-button type="default" @click="createPopupVisible = false">Cancel</n-button>
+                <n-button type="success" @click="createGroupSubmit">Create Group</n-button>
+              </div>
+            </template>
           </n-card>
         </div>
       </n-modal>
@@ -56,14 +62,16 @@ import {
   NFormItem,
   NInput,
   NInputNumber,
+  NSelect,
   useDialog,
   FormItemRule
 } from "naive-ui";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {computed, h, reactive, ref} from "vue";
 import {AbilityActions, useGlimpseAbility} from "@/casl";
-import {AbilitySubjects} from "@/graphql/types";
+import {AbilitySubjects, GetAllGroupNamesDocument} from "@/graphql/types";
 import {subject} from "@casl/ability";
+import {useQuery} from "@vue/apollo-composable";
 
 type RowData = {
   name: string,
@@ -77,7 +85,7 @@ const dialog = useDialog();
 const createGroupFormInput = reactive({
   name: "",
   priority: 0,
-  parent: 0
+  parent: null
 });
 
 const createGroupFormRules = reactive({
@@ -101,6 +109,50 @@ const createGroupFormRules = reactive({
   parent: []
 });
 
+const groupsByName = useQuery(GetAllGroupNamesDocument, {
+  pagination: {
+    take: 10
+  }
+})
+
+const parentOptions = computed(() => {
+  return groupsByName.result.value?.GetAllGroupNames.map((group) => {
+    return {
+      label: group.name,
+      value: group.id
+    }
+  })
+})
+
+function parentSelectScrolled(event: Event) {
+  const currentTarget = event.currentTarget as HTMLElement;
+  if (currentTarget.scrollTop + currentTarget.clientHeight < currentTarget.scrollHeight) {
+    return;
+  }
+
+  const allGroupNames = groupsByName.result.value?.GetAllGroupNames || [];
+  groupsByName.fetchMore({
+    variables: {
+      pagination: {
+        take: 11,
+        cursor: allGroupNames[allGroupNames.length - 1]?.id
+      }
+    },
+    updateQuery(previousResult, {fetchMoreResult}) {
+      // Filter out groups which are already in the list
+      let groupsToAdd = fetchMoreResult?.GetAllGroupNames || [];
+      groupsToAdd = groupsToAdd.filter((group: any) => !previousResult.GetAllGroupNames.find((previousGroup: any) => previousGroup.id === group.id));
+      // Combine the previous list with the list of just fetched groups
+      return {
+        GetAllGroupNames: [
+          ...previousResult.GetAllGroupNames,
+          ...groupsToAdd
+        ]
+      }
+    }
+  })
+}
+
 function deleteGroup(row: RowData) {
   console.log(row);
   dialog.error({
@@ -122,6 +174,10 @@ const createPopupVisible = ref<boolean>(false);
 
 function createGroup() {
   createPopupVisible.value = true;
+}
+
+function createGroupSubmit() {
+  console.log(createGroupFormInput);
 }
 
 const breadcrumbRoute = [
@@ -150,8 +206,8 @@ const tableColumns = [
         h(
           NButton,
           {
-            disabled: !ability.can(AbilityActions.Update, subject(AbilitySubjects.Group, row) as any),
-            title: !ability.can(AbilityActions.Update, subject(AbilitySubjects.Group, row) as any) ? 'You do not have permission to edit this Group' : '',
+            disabled: !ability.can(AbilityActions.Update, subject(AbilitySubjects.Group, row)),
+            title: !ability.can(AbilityActions.Update, subject(AbilitySubjects.Group, row)) ? 'You do not have permission to edit this Group' : '',
             style: 'margin: 0.5em 0.5em 0.5em 0;',
             strong: true,
             tertiary: true,
@@ -162,8 +218,8 @@ const tableColumns = [
         ), h(
           NButton,
           {
-            disabled: !ability.can(AbilityActions.Delete, subject(AbilitySubjects.Group, row) as any),
-            title: !ability.can(AbilityActions.Delete, subject(AbilitySubjects.Group, row) as any) ? 'You do not have permission to delete this Group' : '',
+            disabled: !ability.can(AbilityActions.Delete, subject(AbilitySubjects.Group, row)),
+            title: !ability.can(AbilityActions.Delete, subject(AbilitySubjects.Group, row)) ? 'You do not have permission to delete this Group' : '',
             type: 'error',
             strong: true,
             tertiary: true,
@@ -246,6 +302,14 @@ const tableData: RowData[] = reactive([ // TODO
 
   .create-modal-card {
     width: 80%;
+  }
+
+  .create-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    * {
+      margin-left: 10px;
+    }
   }
 }
 </style>
