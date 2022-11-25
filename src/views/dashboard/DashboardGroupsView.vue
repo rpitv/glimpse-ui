@@ -1,30 +1,64 @@
 <template>
-  <div class="table-card-wrapper">
-    <n-card class="table-card">
-      <n-button v-if="ability.can(AbilityActions.Create, AbilitySubjects.Group)"
-                strong secondary round large type="success" class="create-button">
-        <template #icon>
-          <FontAwesomeIcon icon="fal fa-plus" />
-        </template>
-        Create
-      </n-button>
+  <div>
+    <div>
+      <n-modal v-model:show="createPopupVisible">
+        <div class="create-modal-card-wrapper">
+          <n-card class="create-modal-card">
+            <h1>Create Group</h1>
+            <n-form :model="createGroupFormInput" :rules="createGroupFormRules">
+              <n-form-item label="Name" path="name">
+                <n-input v-model:value="createGroupFormInput.name" maxlength="50" show-count />
+              </n-form-item>
+              <n-form-item label="Priority" path="priority">
+                <n-input-number v-model:value="createGroupFormInput.priority"/>
+              </n-form-item>
+              <n-form-item label="Parent" path="parent">
+                <n-input-number v-model:value="createGroupFormInput.parent"/>
+              </n-form-item>
+            </n-form>
+          </n-card>
+        </div>
+      </n-modal>
+    </div>
+    <div class="table-card-wrapper">
+      <n-card class="table-card">
+        <n-button v-if="ability.can(AbilityActions.Create, AbilitySubjects.Group)"
+                  @click="createGroup"
+                  strong secondary round large type="success" class="create-button">
+          <template #icon>
+            <FontAwesomeIcon icon="fal fa-plus"/>
+          </template>
+          Create
+        </n-button>
 
-      <DashboardBreadcrumb :route="breadcrumbRoute"/>
+        <DashboardBreadcrumb :route="breadcrumbRoute"/>
 
-      <n-data-table
-        remote
-        striped
-        :columns="tableColumns"
-        :pagination="tablePaginationOptions"
-        :loading="isTableLoading"
-        :data="tableData"/>
-    </n-card>
+        <n-data-table
+          remote
+          striped
+          :columns="tableColumns"
+          :pagination="tablePaginationOptions"
+          :loading="isTableLoading"
+          :data="tableData"/>
+      </n-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import DashboardBreadcrumb from "@/components/DashboardBreadcrumb.vue";
-import {NButton, NDataTable, NCard, useDialog} from "naive-ui";
+import {
+  NButton,
+  NDataTable,
+  NCard,
+  NModal,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  useDialog,
+  FormItemRule
+} from "naive-ui";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import {computed, h, reactive, ref} from "vue";
 import {AbilityActions, useGlimpseAbility} from "@/casl";
@@ -39,6 +73,33 @@ type RowData = {
 
 const ability = useGlimpseAbility();
 const dialog = useDialog();
+
+const createGroupFormInput = reactive({
+  name: "",
+  priority: 0,
+  parent: 0
+});
+
+const createGroupFormRules = reactive({
+  name: [
+    {
+      required: true,
+      message: "Name is required"
+    },
+    {
+      validator: (rule: FormItemRule, value: string): boolean => value.length <= 50,
+      message: "Name cannot be longer than 50 characters",
+      trigger: ["input", "blur"]
+    }
+  ],
+  priority: [
+    {
+      required: true,
+      message: "Priority is required"
+    }
+  ],
+  parent: []
+});
 
 function deleteGroup(row: RowData) {
   console.log(row);
@@ -55,6 +116,12 @@ function deleteGroup(row: RowData) {
 
 function editGroup(row: RowData) {
   console.log(row);
+}
+
+const createPopupVisible = ref<boolean>(false);
+
+function createGroup() {
+  createPopupVisible.value = true;
 }
 
 const breadcrumbRoute = [
@@ -169,5 +236,16 @@ const tableData: RowData[] = reactive([ // TODO
 
 .create-button {
   float: right;
+  z-index: 10;
+}
+
+.create-modal-card-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .create-modal-card {
+    width: 80%;
+  }
 }
 </style>
