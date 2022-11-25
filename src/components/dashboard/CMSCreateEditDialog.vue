@@ -3,7 +3,7 @@
     <n-card class="create-modal-card">
       <h1>{{modeText}} {{typeName}}</h1>
       <n-form :model="data" @change="formChanged">
-        <n-form-item v-for="field of fields" :label="field.name" :key="field.key">
+        <n-form-item v-for="field of fieldsToShow" :label="field.name" :key="field.key">
           <component :is="field.renderEditInput()" v-model:value="inputData[field.key]" />
         </n-form-item>
       </n-form>
@@ -50,6 +50,14 @@ const emit = defineEmits(['create', 'close', 'update:data'])
 const inputData = ref<Record<string, any>>(props.data);
 
 const modeText = computed(() => props.mode === 'edit' ? 'Edit' : 'Create');
+
+const fieldsToShow = computed(() => props.fields.filter(field => {
+  if (props.mode === 'edit') {
+    return field.editable;
+  } else {
+    return field.creatable;
+  }
+}));
 </script>
 
 <style scoped lang="scss">

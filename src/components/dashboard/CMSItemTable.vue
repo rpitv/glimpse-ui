@@ -2,7 +2,7 @@
   <div>
     <div>
       <n-modal v-model:show="editDialogOpen">
-        <CMSCreateEditDialog :mode="editDialogMode" :type-name="typeName" :fields="fields" v-model:data="editDialogData" @create="itemCreatedCallback" @close="editDialogOpen = false" />
+        <CMSCreateEditDialog :mode="editingRow === null ? 'create' : 'edit'" :type-name="typeName" :fields="fields" v-model:data="editDialogData" @create="itemCreatedCallback" @close="editDialogOpen = false" />
       </n-modal>
     </div>
     <div class="table-card-wrapper">
@@ -62,7 +62,9 @@ const props = defineProps({
   }
 })
 
-const editDialogMode = ref<"create" | "edit">("create")
+const emit = defineEmits(['create'])
+
+const editingRow = ref<RowData | null>(null);
 const editDialogData = ref<Record<string, any>>({});
 const editDialogOpen = ref<boolean>(false);
 
@@ -139,17 +141,22 @@ const tableData = computed(() => {
 });
 
 function createCallback() {
-  editDialogMode.value = "create";
+  editingRow.value = null;
   editDialogData.value = {};
   editDialogOpen.value = true;
 }
 
 function itemCreatedCallback() {
-  console.log(editDialogData.value)
+  editDialogOpen.value = false;
+  if(editingRow.value === null) {
+    emit('create', editDialogData.value);
+  } else {
+    editingRow.value.edit(editDialogData.value);
+  }
 }
 
 function editCallback(row: RowData) {
-  editDialogMode.value = "edit";
+  editingRow.value = row;
   editDialogData.value = row.data;
   editDialogOpen.value = true;
 }

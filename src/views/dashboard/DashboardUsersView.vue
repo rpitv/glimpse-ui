@@ -1,6 +1,6 @@
 <template>
   <DashboardBreadcrumb :route="breadcrumbRoute"/>
-  <CMSItemTable type-name="User" :fields="tableFields" :data="tableData" />
+  <CMSItemTable type-name="User" :fields="tableFields" :data="tableData" @create="createUser" />
 </template>
 
 <script setup lang="ts">
@@ -42,8 +42,8 @@ const tableFields: CMSField<User>[] = [
     name: 'Person',
     key: 'person',
     readable: false,
-    creatable: true,
-    editable: true,
+    creatable: false,
+    editable: false,
     renderEditInput: () => {
       return h(NInput, {label: 'Person'});
     },
@@ -52,8 +52,8 @@ const tableFields: CMSField<User>[] = [
     name: 'Discord',
     key: 'discord',
     readable: false,
-    creatable: true,
-    editable: true,
+    creatable: false,
+    editable: false,
     renderEditInput: () => {
       return h(NInput, {label: 'Discord'});
     },
@@ -74,6 +74,7 @@ const tableData: CMSItem<User>[] = [
       discord: '1358318523584235'
     },
     edit: (data) => {
+      console.log('edit bowers')
       console.log(data);
     },
     delete: () => {
@@ -84,6 +85,11 @@ const tableData: CMSItem<User>[] = [
     }
   }
 ]
+
+function createUser(data: any) {
+  console.log('create user')
+  console.log(data);
+}
 
 </script>
 
