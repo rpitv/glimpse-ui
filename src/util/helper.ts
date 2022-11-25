@@ -2,6 +2,8 @@ import type { NavButton } from "@/util/NavButton";
 import type { DropdownOption } from "naive-ui";
 import NavigationHeaderButton from "@/components/NavigationHeaderButton.vue";
 import { h } from "vue";
+import type { VNode } from "vue";
+import type { RowData } from "naive-ui/es/data-table/src/interface";
 
 /**
  * Check if a MouseEvent on a link is accompanied by any of the necessary conditions to open the link in a new tab.
@@ -45,6 +47,7 @@ export function shouldOpenInNewTab(e: MouseEvent): boolean {
  *   NavigationHeaderButton, and I am not aware of any way to make Vue templates refer to themselves in their
  *   script.
  * @param child
+ * @param currentDepth
  */
 export function computeNavDropdownChildElement(
   child: NavButton,
@@ -63,3 +66,30 @@ export function computeNavDropdownChildElement(
 }
 
 export type FontAwesomeIconWeights = "fas" | "fal" | "fad" | "fab";
+
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends (infer U)[]
+    ? DeepPartial<U>[]
+    : T[P] extends boolean | string | number
+    ? T[P]
+    : DeepPartial<T[P]>;
+};
+
+export interface CMSField<T> {
+  name: string;
+  key: keyof T;
+  readable: boolean;
+  creatable: boolean;
+  editable: boolean;
+  renderEditInput: () => VNode;
+}
+
+export interface CMSItem<T> {
+  id: any;
+  editable: boolean;
+  deletable: boolean;
+  data: DeepPartial<T>;
+  edit: (data: DeepPartial<T>) => void;
+  delete: () => void;
+  deleteMessage: (row: RowData) => string;
+}
