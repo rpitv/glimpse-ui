@@ -7,8 +7,7 @@
     </div>
     <div class="table-card-wrapper">
       <n-card class="table-card">
-        <!-- FIXME v-if -->
-        <n-button v-if="ability.can(AbilityActions.Create, AbilitySubjects.Group)"
+        <n-button v-if="props.creatable"
                   @click="createCallback"
                   strong secondary round large type="success" class="create-button">
           <template #icon>
@@ -21,11 +20,10 @@
           remote
           striped
           :columns="tableColumns"
-          :data="tableData"/>
-
-        <!-- TODO -->
-        <!--        :pagination="tablePaginationOptions"-->
-        <!--        :loading="isTableLoading"-->
+          :data="props.data"
+          :loading="props.loading"
+          :pagination="tablePaginationOptions"
+        />
       </n-card>
     </div>
   </div>
@@ -38,7 +36,6 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import type {PropType} from "vue";
 import type {CMSField} from "@/util/helper";
 import {useGlimpseAbility} from "@/casl";
-import {AbilityActions, AbilitySubjects} from "@/graphql/types";
 import {computed, h, ref} from "vue";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
 import type {Type} from "naive-ui/es/button/src/interface";
@@ -56,13 +53,34 @@ const props = defineProps({
     required: true,
     type: Array as PropType<CMSField<any>[]>
   },
+  creatable: {
+    type: Boolean,
+    default: true
+  },
   data: {
     required: true,
     type: Array as PropType<any[]>
-  }
+  },
+  totalItems: {
+    required: false,
+    type: Number,
+    default: 0
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  currentPage: {
+    type: Number,
+    default: 1
+  },
+  pageSize: {
+    type: Number,
+    default: 20
+  },
 })
 
-const emit = defineEmits(['create'])
+const emit = defineEmits(['create', 'update:page-size', 'update:current-page'])
 
 const editingRow = ref<RowData | null>(null);
 const editDialogData = ref<Record<string, any>>({});
@@ -136,9 +154,19 @@ const tableColumns = computed(() => {
   return [...selectedColumns, actionsColumn];
 });
 
-const tableData = computed(() => {
-  return props.data;
-});
+const tablePaginationOptions = computed(() => ({
+  page: props.currentPage,
+  pageSize: props.pageSize,
+  pageSlot: 5,
+  pageCount: Math.max(1, Math.ceil(props.totalItems / props.pageSize)),
+  onChange: (page: number) => {
+    emit('update:current-page', page);
+  },
+  onUpdatePageSize: (size: number) => {
+    emit('update:page-size', size);
+    emit('update:current-page', 1);
+  }
+}));
 
 function createCallback() {
   editingRow.value = null;

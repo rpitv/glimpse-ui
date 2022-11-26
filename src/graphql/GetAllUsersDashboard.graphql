@@ -1,0 +1,15 @@
+query GetAllUsersDashboard($pagination: Pagination) {
+  userCount: countUser
+  GetAllUsersDashboard: findManyUser(pagination: $pagination) {
+    id
+    username
+    mail
+    discord
+    joined
+    person {
+      id
+      name
+    }
+  }
+
+}

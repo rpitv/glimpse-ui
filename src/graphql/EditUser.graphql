@@ -1,0 +1,5 @@
+mutation EditUser($id: ID!, $input: UserUpdateInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+  }
+}
