@@ -229,5 +229,6 @@ function deleteCallback(row: RowData) {
 .create-button {
   margin-bottom: 10px;
   float: right;
+  z-index: 1;
 }
 </style>
