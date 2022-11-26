@@ -1,5 +1,5 @@
 import type { NavButton } from "@/util/NavButton";
-import type { DropdownOption } from "naive-ui";
+import type { DropdownOption, FormItemRule } from "naive-ui";
 import NavigationHeaderButton from "@/components/NavigationHeaderButton.vue";
 import { h } from "vue";
 import type { VNode } from "vue";
@@ -81,7 +81,8 @@ export interface CMSField<T> {
   readable: boolean;
   creatable: boolean;
   editable: boolean;
-  renderEditInput: () => VNode;
+  rules?: FormItemRule[];
+  renderEditInput?: () => VNode;
 }
 
 export interface CMSItem<T> {

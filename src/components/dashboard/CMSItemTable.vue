@@ -44,6 +44,13 @@ import CMSCreateEditDialog from "@/components/dashboard/CMSCreateEditDialog.vue"
 const ability = useGlimpseAbility();
 const dialog = useDialog()
 
+type ExtraAction = {
+  name: string,
+  type: Type,
+  enabled?: (row: RowData) => boolean,
+  callback: (row: RowData) => void
+}
+
 const props = defineProps({
   typeName: {
     required: true,
@@ -78,6 +85,10 @@ const props = defineProps({
     type: Number,
     default: 20
   },
+  extraActions: {
+    type: Array as PropType<ExtraAction[]>,
+    default: []
+  }
 })
 
 const emit = defineEmits(['create', 'update:page-size', 'update:current-page'])
@@ -122,6 +133,17 @@ const tableColumns = computed(() => {
       buttonType: "error"
     }
   ]
+
+  props.extraActions.forEach(action => {
+    actions.push({
+      name: action.name,
+      enabled: (row: RowData) => !action.enabled || action.enabled(row),
+      onClick(row: RowData) {
+        action.callback(row);
+      },
+      buttonType: action.type
+    })
+  })
 
   const actionsColumn = {
     key: 'actions',

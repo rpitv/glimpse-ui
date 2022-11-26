@@ -2,15 +2,15 @@
   <div>
     <n-card class="create-modal-card">
       <h1>{{modeText}} {{typeName}}</h1>
-      <n-form :model="data" @change="formChanged">
-        <n-form-item v-for="field of fieldsToShow" :label="field.name" :key="field.key">
-          <component :is="field.renderEditInput()" v-model:value="inputData[field.key]" />
+      <n-form ref="formRef" :model="data" @input="formChanged" :rules="allFormRules">
+        <n-form-item v-for="field of fieldsToShow" :label="field.name" :key="field.key" :path="field.key">
+          <component v-if="field.renderEditInput" :is="field.renderEditInput()" v-model:value="inputData[field.key]" @keyup="keyPressedOnInput" />
         </n-form-item>
       </n-form>
       <template #action>
         <div class="create-action-buttons">
           <n-button type="default" @click="emit('close')">Cancel</n-button>
-          <n-button type="success" @click="emit('create')">{{modeText}} {{typeName}}</n-button>
+          <n-button :disabled="!isFormValid" type="success" @click="emit('create')">{{modeText}} {{typeName}}</n-button>
         </div>
       </template>
     </n-card>
@@ -18,12 +18,39 @@
 </template>
 
 <script setup lang="ts">
-import {NCard, NForm, NFormItem, NButton} from "naive-ui";
+import {NCard, NForm, NFormItem, NButton, FormItemRule, FormValidationError} from "naive-ui";
 import {CMSField} from "@/util/helper";
-import {computed, PropType, ref} from "vue";
+import {computed, onMounted, PropType, ref} from "vue";
+
+const formRef = ref<typeof NForm|null>(null);
+const isFormValid = ref<boolean>(false);
+
+onMounted(() => {
+  updateValidation();
+  formRef.value?.restoreValidation();
+});
+
+function updateValidation() {
+  if(!formRef.value) {
+    return;
+  }
+  formRef.value.validate((errors: FormValidationError[]) => {
+    isFormValid.value = !errors || errors.length === 0;
+  });
+}
 
 function formChanged() {
   emit('update:data', inputData.value);
+  updateValidation();
+}
+
+function keyPressedOnInput(e: KeyboardEvent) {
+  if(e.key === 'Enter') {
+    updateValidation();
+    if(isFormValid.value) {
+      emit('create');
+    }
+  }
 }
 
 const props = defineProps({
@@ -58,6 +85,16 @@ const fieldsToShow = computed(() => props.fields.filter(field => {
     return field.creatable;
   }
 }));
+
+const allFormRules = computed(() => {
+  const rules: Record<string, FormItemRule | FormItemRule[]> = {};
+  for (const field of fieldsToShow.value) {
+    if(field.rules) {
+      rules[<string>field.key] = field.rules;
+    }
+  }
+  return rules;
+});
 </script>
 
 <style scoped lang="scss">

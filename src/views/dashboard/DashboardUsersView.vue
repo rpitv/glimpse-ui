@@ -9,12 +9,13 @@
     v-model:current-page="tableCurrentPage"
     :total-items="users.result.value?.userCount ?? 0"
     :loading="users.loading.value"
+    :extra-actions="extraActions"
     @create="createUser"
   />
 </template>
 
 <script setup lang="ts">
-import {NInput} from "naive-ui";
+import {NInput, useMessage} from "naive-ui";
 import DashboardBreadcrumb from "@/components/DashboardBreadcrumb.vue";
 import CMSItemTable from "@/components/dashboard/CMSItemTable.vue";
 import type {CMSField, CMSItem, DeepPartial} from "@/util/helper";
@@ -30,6 +31,7 @@ import {
 } from "@/graphql/types";
 import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
+import type {RowData} from "naive-ui/es/data-table/src/interface";
 
 const breadcrumbRoute = [
   {name: 'Dashboard', route: '/dashboard'},
@@ -38,19 +40,42 @@ const breadcrumbRoute = [
 
 const tablePageSize = ref<number>(20);
 const tableCurrentPage = ref<number>(1);
+const extraActions = [{
+  name: 'Change Password',
+  type: 'info',
+  enabled(row: RowData) {
+    return ability.can(AbilityActions.Update, subject(AbilitySubjects.User, row), 'password');
+  },
+  callback(row: RowData) {
+    console.log(row);
+  }
+}]
 
 const ability = useGlimpseAbility();
+const message = useMessage();
 const updateUserMut = useMutation(EditUserDocument);
 updateUserMut.onDone(() => {
   users.refetch();
+});
+updateUserMut.onError((error) => {
+  console.error(error);
+  message.error('Failed to update user');
 });
 const deleteUserMut = useMutation(DeleteUserDocument);
 deleteUserMut.onDone(() => {
   users.refetch();
 });
+deleteUserMut.onError((error) => {
+  console.error(error);
+  message.error('Failed to delete user');
+});
 const createUserMut = useMutation(CreateNewUserDocument);
 createUserMut.onDone(() => {
   users.refetch();
+});
+createUserMut.onError((error) => {
+  console.error(error);
+  message.error('Failed to create user');
 });
 const getAllUsersArgs = computed(() => {
   return {
@@ -61,8 +86,19 @@ const getAllUsersArgs = computed(() => {
   }
 })
 const users = useQuery(GetAllUsersDashboardDocument, getAllUsersArgs);
+users.onError((error) => {
+  console.error(error);
+  message.error('Failed to fetch users');
+});
 
 const tableFields: CMSField<User>[] = [
+  {
+    name: 'ID',
+    key: 'id',
+    readable: true,
+    creatable: false,
+    editable: false
+  },
   {
     name: 'Username',
     key: 'username',
@@ -70,8 +106,12 @@ const tableFields: CMSField<User>[] = [
     creatable: true,
     editable: true,
     renderEditInput: () => {
-      return h(NInput, {label: 'Username'});
+      return h(NInput, {label: 'Username', maxlength: 8, showCount: true});
     },
+    rules: [
+      {required: true, message: 'Username is required', trigger: ['blur', 'input']},
+      {max: 8, message: 'Username must be at most 8 characters', trigger: ['blur', 'input']}
+    ]
   },
   {
     name: 'Email',
@@ -80,8 +120,12 @@ const tableFields: CMSField<User>[] = [
     creatable: true,
     editable: true,
     renderEditInput: () => {
-      return h(NInput, {label: 'Email'});
+      return h(NInput, {label: 'Email', maxlength: 300});
     },
+    rules: [
+      {required: true, message: 'Email is required', trigger: ['blur', 'input']},
+      {message: 'Must be a valid email address', type: 'email', trigger: ['blur', 'input']}
+    ]
   },
   {
     name: 'Person',
@@ -113,16 +157,16 @@ const tableData: Ref<CMSItem<User>[]> = computed(() => {
       editable: ability.can(AbilityActions.Update, subject(AbilitySubjects.User, {...user})),
       deletable: ability.can(AbilityActions.Delete, subject(AbilitySubjects.User, {...user})),
       edit(data: DeepPartial<User>) {
-        if(data.username === user.username) {
+        if (data.username === user.username) {
           delete data.username;
         }
-        if(data.mail === user.mail) {
+        if (data.mail === user.mail) {
           delete data.mail;
         }
-        if(data.discord === user.discord) {
+        if (data.discord === user.discord) {
           delete data.discord;
         }
-        if(data.person?.id === user.person?.id) {
+        if (data.person?.id === user.person?.id) {
           delete data.person;
         }
         const inputData: UserUpdateInput = {
