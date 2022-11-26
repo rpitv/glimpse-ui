@@ -15,6 +15,7 @@
           </template>
           Create
         </n-button>
+        <slot name="header"></slot>
 
         <n-data-table
           remote

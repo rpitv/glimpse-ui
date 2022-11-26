@@ -1,17 +1,31 @@
 <template>
-  <DashboardBreadcrumb :route="breadcrumbRoute"/>
-  <CMSItemTable
-    type-name="User"
-    :fields="tableFields"
-    :data="tableData"
-    :creatable="ability.can(AbilityActions.Create, AbilitySubjects.User)"
-    v-model:page-size="tablePageSize"
-    v-model:current-page="tableCurrentPage"
-    :total-items="users.result.value?.userCount ?? 0"
-    :loading="users.loading.value"
-    :extra-actions="extraActions"
-    @create="createUser"
-  />
+  <div class="wrapper">
+    <div>
+      <div>
+        <ChangePasswordDialog
+          v-model:show="showChangePasswordDialog"
+          :require-current="false"
+          @submit="passwordChanged"
+        />
+      </div>
+      <CMSItemTable
+        type-name="User"
+        :fields="tableFields"
+        :data="tableData"
+        :creatable="ability.can(AbilityActions.Create, AbilitySubjects.User)"
+        v-model:page-size="tablePageSize"
+        v-model:current-page="tableCurrentPage"
+        :total-items="users.result.value?.userCount ?? 0"
+        :loading="users.loading.value"
+        :extra-actions="extraActions"
+        @create="createUser"
+      >
+        <template #header>
+          <DashboardBreadcrumb :route="breadcrumbRoute"/>
+        </template>
+      </CMSItemTable>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -32,12 +46,15 @@ import {
 import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
 
 const breadcrumbRoute = [
   {name: 'Dashboard', route: '/dashboard'},
   {name: 'Users', route: '/dashboard/users'}
 ];
 
+const changePasswordDialogIsFor = ref<RowData|null>(null);
+const showChangePasswordDialog = ref<boolean>(false);
 const tablePageSize = ref<number>(20);
 const tableCurrentPage = ref<number>(1);
 const extraActions = [{
@@ -48,6 +65,8 @@ const extraActions = [{
   },
   callback(row: RowData) {
     console.log(row);
+    changePasswordDialogIsFor.value = row;
+    showChangePasswordDialog.value = true;
   }
 }]
 
@@ -199,8 +218,28 @@ function createUser(data: any) {
   });
 }
 
+function passwordChanged({newPassword}: {newPassword: string, currentPassword?: string}) {
+  if (changePasswordDialogIsFor.value) {
+    updateUserMut.mutate({
+      id: changePasswordDialogIsFor.value.id,
+      input: {
+        password: newPassword
+      }
+    });
+    showChangePasswordDialog.value = false;
+  }
+}
+
 </script>
 
 <style scoped lang="scss">
-
+.wrapper {
+  display: flex;
+  justify-content: center;
+  & > div {
+    width: 80%;
+  }
+  margin-top: 5em;
+  margin-bottom: 5em;
+}
 </style>
