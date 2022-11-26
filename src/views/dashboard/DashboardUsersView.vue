@@ -47,6 +47,7 @@ import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
+import {RouterLink} from "vue-router";
 
 const breadcrumbRoute = [
   {name: 'Dashboard', route: '/dashboard'},
@@ -149,12 +150,18 @@ const tableFields: CMSField<User>[] = [
   {
     name: 'Person',
     key: 'person',
-    readable: false,
+    readable: true,
     creatable: false,
     editable: false,
     renderEditInput: () => {
       return h(NInput, {label: 'Person'});
     },
+    renderTableCell(row: RowData) {
+      if(!row.person) {
+        return '';
+      }
+      return h(RouterLink, {to: `/dashboard/people/${row.person.id}`}, row.person.name);
+    }
   },
   {
     name: 'Discord',
