@@ -29,18 +29,18 @@
 </template>
 
 <script setup lang="ts">
-import {NInput, useMessage} from "naive-ui";
+import {NInput, NSelect, useMessage} from "naive-ui";
 import DashboardBreadcrumb from "@/components/DashboardBreadcrumb.vue";
 import CMSItemTable from "@/components/dashboard/CMSItemTable.vue";
 import type {CMSField, CMSItem, DeepPartial} from "@/util/helper";
-import type {User, UserUpdateInput} from "@/graphql/types";
+import type {Person, User, UserUpdateInput} from "@/graphql/types";
 import {computed, h, ref, Ref} from "vue";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
   AbilityActions,
   AbilitySubjects,
   CreateNewUserDocument, DeleteUserDocument,
-  EditUserDocument,
+  EditUserDocument, GetAllPeopleDocument,
   GetAllUsersDocument
 } from "@/graphql/types";
 import {useGlimpseAbility} from "@/casl";
@@ -110,6 +110,53 @@ users.onError((error) => {
   console.error(error);
   message.error('Failed to fetch users');
 });
+const people = useQuery(GetAllPeopleDocument, { pagination: { take: 100 }});
+people.onError((error) => {
+  console.error(error);
+  message.error('Failed to fetch people');
+});
+
+const peopleDropdownOptions = computed(() => {
+  return people.result.value?.GetAllPeople.map((person) => {
+    return {
+      label: person.name,
+      value: person.id
+    }
+  }) ?? [];
+});
+
+function onPeopleDropdownScroll(event: Event) {
+  const target = event.currentTarget as HTMLElement;
+  // When we're within 10px of the bottom of the scroll window, attempt to fetch more people.
+  if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10) {
+    // If we're already fetching more results, or we've fetched all the results, don't fetch more
+    if(people.loading.value || (people.result.value?.GetAllPeople.length ?? 0) >= (people.result.value?.personCount ?? 0)) {
+      return;
+    }
+
+    people.fetchMore({
+      variables: {
+        pagination: {
+          take: 100,
+          cursor: people.result?.value?.GetAllPeople[people.result?.value?.GetAllPeople.length - 1]?.id
+        }
+      },
+      updateQuery(previousResult, {fetchMoreResult}) {
+        // Filter out people which are already in the list
+        let peopleToAdd = fetchMoreResult?.GetAllPeople || [];
+        peopleToAdd = peopleToAdd.filter((group: any) => !previousResult.GetAllPeople.find((previousPerson: any) => previousPerson.id === group.id));
+        // Combine the previous list with the list of just fetched groups
+        return {
+          personCount: fetchMoreResult?.personCount ?? 0,
+          GetAllPeople: [
+            ...previousResult.GetAllPeople,
+            ...peopleToAdd
+          ]
+        }
+      }
+    });
+  }
+}
 
 const tableFields: CMSField<User>[] = [
   {
@@ -126,7 +173,7 @@ const tableFields: CMSField<User>[] = [
     creatable: true,
     editable: true,
     renderEditInput: () => {
-      return h(NInput, {label: 'Username', maxlength: 8, showCount: true});
+      return h(NInput, {maxlength: 8, showCount: true});
     },
     rules: [
       {required: true, message: 'Username is required', trigger: ['blur', 'input']},
@@ -140,7 +187,7 @@ const tableFields: CMSField<User>[] = [
     creatable: true,
     editable: true,
     renderEditInput: () => {
-      return h(NInput, {label: 'Email', maxlength: 300});
+      return h(NInput, {maxlength: 300});
     },
     rules: [
       {required: true, message: 'Email is required', trigger: ['blur', 'input']},
@@ -151,17 +198,31 @@ const tableFields: CMSField<User>[] = [
     name: 'Person',
     key: 'person',
     readable: true,
-    creatable: false,
-    editable: false,
+    creatable: true,
+    editable: true,
     renderEditInput: () => {
-      return h(NInput, {label: 'Person'});
+      return h(NSelect, {'onScroll': onPeopleDropdownScroll, options: peopleDropdownOptions.value, clearable: true});
     },
     renderTableCell(row: RowData) {
       if(!row.person) {
         return '';
       }
-      return h(RouterLink, {to: `/dashboard/people/${row.person.id}`}, row.person.name);
-    }
+      return h(RouterLink, {to: `/dashboard/people/${row.person.id}`}, {
+        default: () => row.person.name
+      });
+    },
+    inputValueTransformer(value: Person|null) {
+      if(!value) {
+        return null;
+      }
+      return value.id;
+    },
+    outputValueTransformer(value: string|null) {
+      if(!value) {
+        return null;
+      }
+      return {id: value};
+    },
   },
   {
     name: 'Discord',
@@ -170,7 +231,7 @@ const tableFields: CMSField<User>[] = [
     creatable: false,
     editable: false,
     renderEditInput: () => {
-      return h(NInput, {label: 'Discord'});
+      return h(NInput);
     },
   }
 ]
@@ -198,7 +259,7 @@ const tableData: Ref<CMSItem<User>[]> = computed(() => {
         const inputData: UserUpdateInput = {
           username: data.username ?? undefined,
           mail: data.mail ?? undefined,
-          personId: data.person?.id ?? undefined,
+          personId: data.person ? data.person?.id : null,
           discord: data.discord ?? undefined
         }
         updateMut.mutate({
@@ -220,7 +281,8 @@ function createUser(data: any) {
   createMut.mutate({
     input: {
       username: data.username,
-      mail: data.mail
+      mail: data.mail,
+      personId: data.person?.id,
     }
   });
 }
