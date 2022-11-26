@@ -4,7 +4,7 @@
       <h1>{{modeText}} {{typeName}}</h1>
       <n-form ref="formRef" :model="data" @input="formChanged" :rules="allFormRules">
         <n-form-item v-for="field of fieldsToShow" :label="field.name" :key="field.key" :path="field.key">
-          <component v-if="field.renderEditInput" :is="field.renderEditInput()" v-model:value="inputData[field.key]" @keyup="keyPressedOnInput" />
+          <component v-if="field.renderEditInput" :is="field.renderEditInput(data)" v-model:value="inputData[field.key]" @keyup="keyPressedOnInput" />
         </n-form-item>
       </n-form>
       <template #action>

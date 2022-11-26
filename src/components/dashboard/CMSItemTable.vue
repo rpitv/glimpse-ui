@@ -104,7 +104,11 @@ const tableColumns = computed(() => {
       title: field.name,
       key: field.key,
       render(row: RowData) {
-        return h("span", {}, row.data[field.key]);
+        if(field.renderTableCell) {
+          return field.renderTableCell(row);
+        } else {
+          return row.data[field.key];
+        }
       }
     }
   })

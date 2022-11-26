@@ -28,6 +28,7 @@ import CMSItemTable from "@/components/dashboard/CMSItemTable.vue";
 import type {CMSField, CMSItem, DeepPartial} from "@/util/helper";
 import type {Person, PersonUpdateInput} from "@/graphql/types";
 import {computed, h, ref, Ref} from "vue";
+import moment from "moment";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
   AbilityActions, AbilitySubjects, CreateNewPersonDocument,
@@ -35,6 +36,7 @@ import {
 } from "@/graphql/types";
 import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
+import type {RowData} from "naive-ui/es/data-table/src/interface";
 
 const breadcrumbRoute = [
   {name: 'Dashboard', route: '/dashboard'},
@@ -127,6 +129,9 @@ const tableFields: CMSField<Person>[] = [
     editable: true,
     renderEditInput: () => {
       return h(NDatePicker, {type: 'date'});
+    },
+    renderTableCell(row: RowData) {
+      return h('span', {}, moment(row.graduation).format('YYYY-MM-DD'));
     },
     rules: [
       {max: 20, message: 'Pronouns must be at most 20 characters', trigger: ['blur', 'input']}

@@ -82,7 +82,8 @@ export interface CMSField<T> {
   creatable: boolean;
   editable: boolean;
   rules?: FormItemRule[];
-  renderEditInput?: () => VNode;
+  renderEditInput?: (row: RowData) => VNode;
+  renderTableCell?: (row: RowData) => VNode;
 }
 
 export interface CMSItem<T> {
