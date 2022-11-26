@@ -1,6 +1,6 @@
-query GetAllUsersDashboard($pagination: Pagination) {
+query GetAllUsers($pagination: Pagination) {
   userCount: countUser
-  GetAllUsersDashboard: findManyUser(pagination: $pagination) {
+  GetAllUsers: findManyUser(pagination: $pagination) {
     id
     username
     mail

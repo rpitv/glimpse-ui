@@ -1,0 +1,13 @@
+query GetAllPeople($pagination: Pagination) {
+  personCount: countPerson
+  GetAllPeople: findManyPerson(pagination: $pagination) {
+    id
+    name
+    pronouns
+    graduation
+    start
+    end
+    description
+  }
+
+}

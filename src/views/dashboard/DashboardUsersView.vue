@@ -41,7 +41,7 @@ import {
   AbilitySubjects,
   CreateNewUserDocument, DeleteUserDocument,
   EditUserDocument,
-  GetAllUsersDashboardDocument
+  GetAllUsersDocument
 } from "@/graphql/types";
 import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
@@ -72,27 +72,27 @@ const extraActions = [{
 
 const ability = useGlimpseAbility();
 const message = useMessage();
-const updateUserMut = useMutation(EditUserDocument);
-updateUserMut.onDone(() => {
+const updateMut = useMutation(EditUserDocument);
+updateMut.onDone(() => {
   users.refetch();
 });
-updateUserMut.onError((error) => {
+updateMut.onError((error) => {
   console.error(error);
   message.error('Failed to update user');
 });
-const deleteUserMut = useMutation(DeleteUserDocument);
-deleteUserMut.onDone(() => {
+const deleteMut = useMutation(DeleteUserDocument);
+deleteMut.onDone(() => {
   users.refetch();
 });
-deleteUserMut.onError((error) => {
+deleteMut.onError((error) => {
   console.error(error);
   message.error('Failed to delete user');
 });
-const createUserMut = useMutation(CreateNewUserDocument);
-createUserMut.onDone(() => {
+const createMut = useMutation(CreateNewUserDocument);
+createMut.onDone(() => {
   users.refetch();
 });
-createUserMut.onError((error) => {
+createMut.onError((error) => {
   console.error(error);
   message.error('Failed to create user');
 });
@@ -104,7 +104,7 @@ const getAllUsersArgs = computed(() => {
     }
   }
 })
-const users = useQuery(GetAllUsersDashboardDocument, getAllUsersArgs);
+const users = useQuery(GetAllUsersDocument, getAllUsersArgs);
 users.onError((error) => {
   console.error(error);
   message.error('Failed to fetch users');
@@ -169,7 +169,7 @@ const tableFields: CMSField<User>[] = [
 ]
 
 const tableData: Ref<CMSItem<User>[]> = computed(() => {
-  return users.result.value?.GetAllUsersDashboard.map((user): CMSItem<User> => {
+  return users.result.value?.GetAllUsers.map((user): CMSItem<User> => {
     return {
       id: user.id,
       data: {...user},
@@ -194,13 +194,13 @@ const tableData: Ref<CMSItem<User>[]> = computed(() => {
           personId: data.person?.id ?? undefined,
           discord: data.discord ?? undefined
         }
-        updateUserMut.mutate({
+        updateMut.mutate({
           id: user.id,
           input: inputData
         });
       },
       delete() {
-        deleteUserMut.mutate({id: user.id});
+        deleteMut.mutate({id: user.id});
       },
       deleteMessage() {
         return `Are you sure you want to delete User "${user.username}"? This is irreversible.`
@@ -210,7 +210,7 @@ const tableData: Ref<CMSItem<User>[]> = computed(() => {
 });
 
 function createUser(data: any) {
-  createUserMut.mutate({
+  createMut.mutate({
     input: {
       username: data.username,
       mail: data.mail
@@ -220,7 +220,7 @@ function createUser(data: any) {
 
 function passwordChanged({newPassword}: {newPassword: string, currentPassword?: string}) {
   if (changePasswordDialogIsFor.value) {
-    updateUserMut.mutate({
+    updateMut.mutate({
       id: changePasswordDialogIsFor.value.id,
       input: {
         password: newPassword
