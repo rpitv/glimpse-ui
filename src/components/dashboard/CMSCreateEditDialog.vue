@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper">
     <n-card class="create-modal-card">
       <h1>{{modeText}} {{typeName}}</h1>
       <n-form ref="formRef" :model="data" @input="formChanged" :rules="allFormRules">
@@ -98,6 +98,9 @@ const allFormRules = computed(() => {
 </script>
 
 <style scoped lang="scss">
+.wrapper {
+  width: min(500px, 90%);
+}
 .create-action-buttons {
   * {
     float: right;
