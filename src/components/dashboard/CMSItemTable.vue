@@ -105,7 +105,7 @@ const tableColumns = computed(() => {
       key: field.key,
       render(row: RowData) {
         if(field.renderTableCell) {
-          return field.renderTableCell(row);
+          return field.renderTableCell(row.data);
         } else {
           return row.data[field.key];
         }

@@ -10,7 +10,6 @@
         v-model:current-page="tableCurrentPage"
         :total-items="people.result.value?.userCount ?? 0"
         :loading="people.loading.value"
-        :extra-actions="extraActions"
         @create="create"
       >
         <template #header>
@@ -128,14 +127,68 @@ const tableFields: CMSField<Person>[] = [
     creatable: true,
     editable: true,
     renderEditInput: () => {
+      return h(NDatePicker, {type: 'date', clearable: true});
+    },
+    renderTableCell(row: RowData) {
+      return row.graduation ? h('span', {}, moment(row.graduation).format('YYYY-MM-DD')) : '';
+    },
+    inputValueTransformer(value: string): number|null {
+      return value ? new Date(value).getTime() : null;
+    },
+    outputValueTransformer(value: number): string|null {
+      return value ? new Date(value).toISOString() : null;
+    }
+  },
+  {
+    name: 'Start Date',
+    key: 'start',
+    readable: true,
+    creatable: true,
+    editable: true,
+    renderEditInput: () => {
       return h(NDatePicker, {type: 'date'});
     },
     renderTableCell(row: RowData) {
-      return h('span', {}, moment(row.graduation).format('YYYY-MM-DD'));
+      return h('span', {}, moment(row.start).format('YYYY-MM-DD'));
+    },
+    inputValueTransformer(value: string): number|null {
+      return value ? new Date(value).getTime() : null;
+    },
+    outputValueTransformer(value: number): string|null {
+      return value ? new Date(value).toISOString() : null;
     },
     rules: [
-      {max: 20, message: 'Pronouns must be at most 20 characters', trigger: ['blur', 'input']}
+      {required: true, message: 'Start date is required', trigger: ['blur', 'input']}
     ]
+  },
+  {
+    name: 'End Date',
+    key: 'end',
+    readable: true,
+    creatable: true,
+    editable: true,
+    renderEditInput: () => {
+      return h(NDatePicker, {type: 'date', clearable: true});
+    },
+    renderTableCell(row: RowData) {
+      return row.end ? h('span', {}, moment(row.end).format('YYYY-MM-DD')) : '';
+    },
+    inputValueTransformer(value: string): number|null {
+      return value ? new Date(value).getTime() : null;
+    },
+    outputValueTransformer(value: number): string|null {
+      return value ? new Date(value).toISOString() : null;
+    }
+  },
+  {
+    name: 'Description',
+    key: 'description',
+    readable: false,
+    creatable: true,
+    editable: true,
+    renderEditInput: () => {
+      return h(NInput, {type: 'textarea'});
+    }
   },
 ]
 
@@ -168,9 +221,9 @@ const tableData: Ref<CMSItem<Person>[]> = computed(() => {
         const inputData: PersonUpdateInput = {
           name: data.name ?? undefined,
           pronouns: data.pronouns ?? undefined,
-          graduation: data.graduation ?? undefined,
+          graduation: data.graduation,
           start: data.start ?? undefined,
-          end: data.end ?? undefined,
+          end: data.end,
           description: data.description ?? undefined,
         }
         updateMut.mutate({
