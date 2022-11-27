@@ -18,6 +18,7 @@
         :total-items="users.result.value?.userCount ?? 0"
         :loading="users.loading.value"
         :extra-actions="extraActions"
+        :expanded-row="renderExpandedRow"
         @create="createUser"
       >
         <template #header>
@@ -33,8 +34,8 @@ import {NInput, NSelect, useMessage} from "naive-ui";
 import DashboardBreadcrumb from "@/components/DashboardBreadcrumb.vue";
 import CMSItemTable from "@/components/dashboard/CMSItemTable.vue";
 import type {CMSField, CMSItem, DeepPartial} from "@/util/helper";
-import type {Person, User, UserUpdateInput} from "@/graphql/types";
-import {computed, h, ref, Ref} from "vue";
+import type {Person, User} from "@/graphql/types";
+import {computed, h, ref, Ref, VNode} from "vue";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
   AbilityActions,
@@ -47,6 +48,7 @@ import {useGlimpseAbility} from "@/casl";
 import {subject} from "@casl/ability";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
+import UserPropertiesEditor from "@/components/dashboard/UserPropertiesEditor.vue";
 import {RouterLink} from "vue-router";
 
 const breadcrumbRoute = [
@@ -158,6 +160,12 @@ function onPeopleDropdownScroll(event: Event) {
   }
 }
 
+function renderExpandedRow(row: RowData): VNode {
+  return h(UserPropertiesEditor, {
+    user: row
+  });
+}
+
 const tableFields: CMSField<User>[] = [
   {
     name: 'ID',
@@ -244,27 +252,14 @@ const tableData: Ref<CMSItem<User>[]> = computed(() => {
       editable: ability.can(AbilityActions.Update, subject(AbilitySubjects.User, {...user})),
       deletable: ability.can(AbilityActions.Delete, subject(AbilitySubjects.User, {...user})),
       edit(data: DeepPartial<User>) {
-        if (data.username === user.username) {
-          delete data.username;
-        }
-        if (data.mail === user.mail) {
-          delete data.mail;
-        }
-        if (data.discord === user.discord) {
-          delete data.discord;
-        }
-        if (data.person?.id === user.person?.id) {
-          delete data.person;
-        }
-        const inputData: UserUpdateInput = {
-          username: data.username ?? undefined,
-          mail: data.mail ?? undefined,
-          personId: data.person ? data.person?.id : null,
-          discord: data.discord ?? undefined
-        }
         updateMut.mutate({
           id: user.id,
-          input: inputData
+          input: {
+            username: data.username === user.username ? undefined : data.username ?? null,
+            mail: data.mail === user.mail ? undefined : data.mail ?? null,
+            personId: data.person?.id === user.person?.id ? undefined : data.person?.id ?? null,
+            discord: data.discord === user.discord ? undefined : data.discord ?? null,
+          }
         });
       },
       delete() {

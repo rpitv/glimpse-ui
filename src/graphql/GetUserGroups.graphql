@@ -1,0 +1,12 @@
+query GetUserGroups($user: ID!) {
+  User: findOneUser(id: $user) {
+    groups {
+      id
+      group {
+        id
+        name
+        priority
+      }
+    }
+  }
+}

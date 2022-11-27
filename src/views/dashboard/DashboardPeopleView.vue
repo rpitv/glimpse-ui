@@ -25,7 +25,7 @@ import {NInput, NAutoComplete, NDatePicker, useMessage} from "naive-ui";
 import DashboardBreadcrumb from "@/components/DashboardBreadcrumb.vue";
 import CMSItemTable from "@/components/dashboard/CMSItemTable.vue";
 import type {CMSField, CMSItem, DeepPartial} from "@/util/helper";
-import type {Person, PersonUpdateInput} from "@/graphql/types";
+import type {Person} from "@/graphql/types";
 import {computed, h, ref, Ref} from "vue";
 import moment from "moment";
 import {useMutation, useQuery} from "@vue/apollo-composable";
@@ -200,35 +200,16 @@ const tableData: Ref<CMSItem<Person>[]> = computed(() => {
       editable: ability.can(AbilityActions.Update, subject(AbilitySubjects.Person, {...person})),
       deletable: ability.can(AbilityActions.Delete, subject(AbilitySubjects.Person, {...person})),
       edit(data: DeepPartial<Person>) {
-        if (data.name === person.name) {
-          delete data.name;
-        }
-        if (data.pronouns === person.pronouns) {
-          delete data.pronouns;
-        }
-        if (data.graduation === person.graduation) {
-          delete data.graduation;
-        }
-        if (data.start === person.start) {
-          delete data.start;
-        }
-        if (data.end === person.end) {
-          delete data.end;
-        }
-        if (data.description === person.description) {
-          delete data.description;
-        }
-        const inputData: PersonUpdateInput = {
-          name: data.name ?? undefined,
-          pronouns: data.pronouns ?? undefined,
-          graduation: data.graduation,
-          start: data.start ?? undefined,
-          end: data.end,
-          description: data.description ?? undefined,
-        }
         updateMut.mutate({
           id: person.id,
-          input: inputData
+          input: {
+            name: data.name === person.name ? undefined : data.name ?? null,
+            pronouns: data.pronouns === person.pronouns ? undefined : data.pronouns ?? null,
+            graduation: data.graduation === person.graduation ? undefined : data.graduation ?? null,
+            start: data.start === person.start ? undefined : data.start ?? null,
+            end: data.end === person.end ? undefined : data.end ?? null,
+            description: data.description === person.description ? undefined : data.description ?? null,
+          }
         });
       },
       delete() {

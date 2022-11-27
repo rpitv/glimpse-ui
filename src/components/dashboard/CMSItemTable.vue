@@ -21,7 +21,7 @@
           remote
           striped
           :columns="tableColumns"
-          :data="props.data"
+          :data="tableData"
           :loading="props.loading"
           :pagination="tablePaginationOptions"
         />
@@ -34,7 +34,7 @@
 
 import {NCard, NButton, NDataTable, NModal, useDialog} from "naive-ui";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import type {PropType} from "vue";
+import type {PropType, VNode} from "vue";
 import type {CMSField} from "@/util/helper";
 import {useGlimpseAbility} from "@/casl";
 import {computed, h, ref} from "vue";
@@ -89,6 +89,12 @@ const props = defineProps({
   extraActions: {
     type: Array as PropType<ExtraAction[]>,
     default: []
+  },
+  expandedRow: {
+    type: Function as PropType<(row: RowData) => VNode | string>
+  },
+  rowExpandable: {
+    type: Function as PropType<(row: RowData) => boolean>
   }
 })
 
@@ -99,6 +105,20 @@ const editDialogData = ref<Record<string, any>>({});
 const editDialogOpen = ref<boolean>(false);
 
 const tableColumns = computed(() => {
+  let expansionColumn = [];
+  if(props.expandedRow) {
+    const renderExpandedRow = props.expandedRow;
+    expansionColumn.push(
+      {
+        type: 'expand',
+        expandable: (rowData: RowData) => props.rowExpandable ? props.rowExpandable(rowData) : true,
+        renderExpand: (rowData: RowData) => {
+          return renderExpandedRow(rowData);
+        }
+      }
+      )
+  }
+
   const selectedColumns = props.fields.filter(field => field.readable).map((field) => {
     return {
       title: field.name,
@@ -178,8 +198,19 @@ const tableColumns = computed(() => {
     }
   };
 
-  return [...selectedColumns, actionsColumn];
+  return [...expansionColumn, ...selectedColumns, actionsColumn];
 });
+
+// Map input data to the same object but with the row key. Key is determined to be
+//   the "id" field if it exists, otherwise just a random number.
+const tableData = computed(() => {
+  return props.data.map((row) => {
+    return {
+      ...row,
+      key: row.id ?? Math.random()
+    }
+  })
+})
 
 const tablePaginationOptions = computed(() => ({
   page: props.currentPage,
