@@ -1,4 +1,5 @@
 query GetAllGroupNames($pagination: Pagination) {
+  groupCount: countGroup,
   GetAllGroupNames: findManyGroup(pagination: $pagination) {
     id
     name

@@ -97,3 +97,8 @@ export interface CMSItem<T> {
   delete: () => void;
   deleteMessage: (row: RowData) => string;
 }
+
+export interface CMSSelectionRow {
+  key: string;
+  label: string;
+}
