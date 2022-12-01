@@ -76,7 +76,8 @@ const productionSubtitle = computed<string>(() => {
   justify-content: center;
 }
 .card {
-  width: 80%;
+  height: 100%;
+  width: 65%;
   margin-bottom: 3em;
 }
 

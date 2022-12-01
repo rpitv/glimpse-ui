@@ -1,20 +1,29 @@
 <template>
-<n-carousel class="aspect-ratio">
-  <div v-for="item of items">
-    <div v-if="item.__typename === 'Image'">
-      <img :src="item.path" :alt="item.name" />
+  <n-carousel ref="carousel" class="aspect-ratio">
+    <div v-for="item of items">
+      <div v-if="item.__typename === 'Image'">
+        <img :src="item.path" :alt="item.name" />
+      </div>
+      <div v-else>
+        <iframe class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
     </div>
-    <div v-else>
-      <iframe class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-  </div>
-</n-carousel>
+  </n-carousel>
+  <n-space justify="space-between">
+    <n-button text class="left carouselbtns" @click="prev">
+      &#10140;
+    </n-button>
+    <n-button text class="carouselbtns" @click="next">
+      &#10140;
+    </n-button>
+  </n-space>
 </template>
 
 <script setup lang="ts">
 import type {Image, Video} from "@/graphql/types";
 import type {PropType} from "vue";
-import {NCarousel} from "naive-ui";
+import { ref } from "vue";
+import {NCarousel, NSpace, NButton} from "naive-ui";
 
 const props = defineProps({
   items: {
@@ -27,20 +36,41 @@ const props = defineProps({
   }
 });
 
+const carousel = ref<InstanceType<typeof NCarousel> | null>(null);
 
+// Components don't load in fast enough for refs so we need to use functions instead of just calling their methods
+function prev() {
+  carousel.value?.prev();
+}
+
+function next() {
+  carousel.value?.next();
+}
 </script>
 
 <style scoped lang="scss">
 .aspect-ratio {
-  aspect-ratio: 16/9;
-  background: black;
+  aspect-ratio: 16 / 9;
+  background-color: black;
+  height: 100%;
+  width: 100%;
 }
 img {
-  width: 100%;
+  aspect-ratio: 16 / 9;
   height: 100%;
+  width: 100%;
 }
 .videoplayer {
+  aspect-ratio: 16 / 9;
+  height: 100%;
   width: 100%;
-  height: 1000px; // FIXME
+}
+
+.carouselbtns {
+  font-size: 28px;
+}
+
+.left {
+  transform: rotate(180deg);
 }
 </style>
