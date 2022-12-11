@@ -33,7 +33,7 @@ import {
   GetUserGroupsDocument
 } from "@/graphql/types";
 import CMSItemSelector from "@/components/dashboard/CMSItemSelector.vue";
-import {computed, reactive, ref} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps({
   user: {
@@ -58,11 +58,13 @@ createUserGroupMut.onDone(() => {
 const userGroups = useQuery(GetUserGroupsDocument, {
   user: props.user.id
 });
-const allGroupsVars = reactive({
-  pagination: {
+const allGroupsVars = computed(() => {
+  return {
+    pagination: {
       take: tablePageSize.value,
       skip: (tableCurrentPage.value - 1) * tablePageSize.value
     }
+  }
 })
 const allGroups = useQuery(GetAllGroupNamesDocument, allGroupsVars)
 
