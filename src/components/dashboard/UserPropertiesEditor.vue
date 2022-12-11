@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-grid :cols="2" :x-gap="10">
+    <n-grid cols="1 s:1 m:2" responsive="screen" :x-gap="10">
       <n-grid-item>
         <h2>Groups</h2>
         <CMSItemSelector :displayed-rows="displayedRows" :selected-rows="selectedRows"
@@ -14,7 +14,7 @@
       </n-grid-item>
       <n-grid-item>
         <h2>Permissions</h2>
-        <div>TODO</div>
+        <PermissionsEditor />
       </n-grid-item>
     </n-grid>
   </div>
@@ -34,6 +34,7 @@ import {
 } from "@/graphql/types";
 import CMSItemSelector from "@/components/dashboard/CMSItemSelector.vue";
 import {computed, ref} from "vue";
+import PermissionsEditor from "@/components/dashboard/PermissionsEditor.vue";
 
 const props = defineProps({
   user: {
