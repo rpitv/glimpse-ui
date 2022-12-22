@@ -15,11 +15,11 @@
       </div>
     </n-carousel>
     <n-space justify="space-between" v-if="items.length > 1">
-      <n-button text class="left carouselbtns" @click="prev">
-        &#10140;
+      <n-button text class="carousel-btns" @click="prev">
+        <FontAwesomeIcon icon="fas fa-arrow-left" />
       </n-button>
-      <n-button text class="carouselbtns" @click="next">
-        &#10140;
+      <n-button text class="carousel-btns" @click="next">
+        <FontAwesomeIcon icon="fas fa-arrow-right" />
       </n-button>
     </n-space>
   </div>
@@ -33,6 +33,7 @@ import type {Image, Video} from "@/graphql/types";
 import type {PropType} from "vue";
 import {ref, watchEffect} from "vue";
 import {NCarousel, NSpace, NButton} from "naive-ui";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const props = defineProps({
   items: {
@@ -81,7 +82,8 @@ img {
   width: 100%;
 }
 
-.carouselbtns {
+.carousel-btns {
+  margin-top: 5px;
   font-size: 28px;
 }
 
