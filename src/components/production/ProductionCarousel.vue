@@ -87,10 +87,6 @@ img {
   font-size: 28px;
 }
 
-.left {
-  transform: rotate(180deg);
-}
-
 .no-media {
   text-align: center;
   font-style: italic;
