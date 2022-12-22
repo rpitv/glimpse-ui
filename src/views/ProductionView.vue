@@ -1,18 +1,24 @@
 <template>
   <div class="card-wrapper">
     <n-card class="card">
-      <ProductionCarousel :items="productionImagesAndVideos"/>
-      <h1 class="prod-title">{{ production.result.value?.ReadProduction?.name }}</h1>
-      <p class="prod-subtitle">{{ productionSubtitle }}</p>
-      <p class="prod-description">{{ production.result.value?.ReadProduction?.description }}</p>
-      <ProductionCredits :credits="production.result.value?.ReadProduction.credits"/>
-      <ProductionTags :tags="production.result.value?.ReadProduction?.tags.map(tag => tag.tag)"/>
+      <div v-if="!production.loading.value">
+        <ProductionCarousel :items="productionImagesAndVideos"/>
+        <h1 class="prod-title">{{ production.result.value?.ReadProduction?.name }}</h1>
+        <p class="prod-subtitle">{{ productionSubtitle }}</p>
+        <p class="prod-description">{{ production.result.value?.ReadProduction?.description }}</p>
+        <ProductionCredits :credits="production.result.value?.ReadProduction.credits"/>
+        <ProductionTags :tags="production.result.value?.ReadProduction?.tags.map(tag => tag.tag)"/>
+      </div>
+      <div v-else class="loading">
+        <n-spin />
+        <p>Loading...</p>
+      </div>
     </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import {NCard} from "naive-ui";
+import {NCard, NSpin} from "naive-ui";
 import {useRoute} from "vue-router";
 import {useQuery} from "@vue/apollo-composable";
 import {ProductionImage, ProductionVideo, ReadProductionDocument} from "@/graphql/types";
@@ -91,6 +97,10 @@ const productionSubtitle = computed<string>(() => {
   height: 100%;
   width: 65%;
   margin-bottom: 3em;
+}
+
+.loading {
+  text-align: center;
 }
 
 .prod-title, .prod-subtitle {
