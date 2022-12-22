@@ -52,7 +52,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['create', 'delete'])
 
 const availableActions: AbilityActions[] = [
   AbilityActions.Create, AbilityActions.Read, AbilityActions.Update, AbilityActions.Delete, AbilityActions.Manage
@@ -102,11 +102,14 @@ const subjectsOptions = computed(() => {
 const selectedSubjects = ref<AbilitySubjects[]>([]);
 
 function createPermissionClicked() {
-  console.log(selectedAction.value, selectedSubjects.value);
+  emit('create', {
+    action: selectedAction.value,
+    subject: selectedSubjects.value
+  });
 }
 
 function deletePermissionClicked(permission: Permission) {
-  console.log(permission);
+  emit('delete', permission.id);
 }
 
 </script>

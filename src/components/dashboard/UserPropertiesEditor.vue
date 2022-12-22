@@ -14,7 +14,7 @@
       </n-grid-item>
       <n-grid-item>
         <h2>Permissions</h2>
-        <PermissionsEditor :value="user.data.permissions" />
+        <PermissionsEditor :value="user.data.permissions" @create="permissionCreated" @delete="permissionDeleted" />
       </n-grid-item>
     </n-grid>
   </div>
@@ -22,11 +22,12 @@
 
 <script setup lang="ts">
 import {NGrid, NGridItem} from "naive-ui";
-import type {User} from "@/graphql/types";
+import type {User, UserPermission} from "@/graphql/types";
 import type {PropType} from "vue";
 import type {CMSItem, CMSSelectionRow} from "@/util/helper";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
+  AbilityActions, AbilitySubjects,
   CreateUserGroupDocument,
   DeleteUserGroupDocument,
   GetAllGroupNamesDocument,
@@ -103,6 +104,14 @@ if (userGroup) {
       id: userGroup.id
     });
   }
+}
+
+function permissionCreated(action: AbilityActions, subject: AbilitySubjects[]) {
+console.log(action, subject);
+}
+
+function permissionDeleted(permission: UserPermission) {
+console.log(permission);
 }
 </script>
 
