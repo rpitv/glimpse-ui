@@ -1,12 +1,16 @@
 <template>
   <div v-if="items.length > 0">
     <n-carousel ref="carousel" class="aspect-ratio">
-      <div v-for="item of items">
+      <div v-for="item of items" class="carousel-contents extend-height">
         <div v-if="item.__typename === 'Image'">
           <img :src="item.path" :alt="item.name" />
         </div>
-        <div v-else>
-          <iframe class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <div v-else class="extend-height">
+          <iframe v-if="item.format === 'EMBED'" class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div v-else class="unsupported-format">
+            <p>Sorry, videos in this format currently cannot be played.</p>
+            <p>Contact us to download a copy of this video.</p>
+          </div>
         </div>
       </div>
     </n-carousel>
@@ -59,11 +63,13 @@ function next() {
 
 <style scoped lang="scss">
 .aspect-ratio {
+  position: relative;
   aspect-ratio: 16 / 9;
   background-color: black;
   height: 100%;
   width: 100%;
 }
+
 img {
   aspect-ratio: 16 / 9;
   height: 100%;
@@ -87,4 +93,20 @@ img {
   text-align: center;
   font-style: italic;
 }
+
+.unsupported-format {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  font-style: italic;
+}
+
+.extend-height {
+  position: relative;
+  height: 100%;
+}
+
 </style>
