@@ -1,5 +1,8 @@
 <template>
-
+  <h3>Credits</h3>
+  <div>
+    {{credits}}
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -8,7 +11,7 @@ import type {Credit} from "@/graphql/types";
 
 const props = defineProps({
   credits: {
-    type: Array as PropType<Pick<Credit, "__typename" | "title" | "priority" | "person">[]>,
+    type: Array as PropType<Pick<Credit, "__typename" | "title" | "priority" | "person" | "id">[]>,
     required: true
   }
 });

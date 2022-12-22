@@ -5,7 +5,7 @@
       <h1 class="prod-title">{{ production.result.value?.ReadProduction?.name }}</h1>
       <p class="prod-subtitle">{{ productionSubtitle }}</p>
       <p class="prod-description">{{ production.result.value?.ReadProduction?.description }}</p>
-      <ProductionCredits :credits="[]"/>
+      <ProductionCredits :credits="production.result.value?.ReadProduction.credits"/>
       <ProductionTags :tags="production.result.value?.ReadProduction?.tags.map(tag => tag.tag)"/>
     </n-card>
   </div>

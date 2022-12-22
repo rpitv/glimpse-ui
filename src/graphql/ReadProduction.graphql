@@ -3,6 +3,15 @@ query ReadProduction($id: ID!) {
     name
     description
     startTime
+    credits {
+      id
+      person {
+        id
+        name
+      }
+      title
+      priority
+    }
     category {
       name
     }
