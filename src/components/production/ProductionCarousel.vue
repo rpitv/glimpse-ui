@@ -1,22 +1,27 @@
 <template>
-  <n-carousel ref="carousel" class="aspect-ratio">
-    <div v-for="item of items">
-      <div v-if="item.__typename === 'Image'">
-        <img :src="item.path" :alt="item.name" />
+  <div v-if="items.length > 0">
+    <n-carousel ref="carousel" class="aspect-ratio">
+      <div v-for="item of items">
+        <div v-if="item.__typename === 'Image'">
+          <img :src="item.path" :alt="item.name" />
+        </div>
+        <div v-else>
+          <iframe class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
       </div>
-      <div v-else>
-        <iframe class="videoplayer" :src="item.metadata.url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-    </div>
-  </n-carousel>
-  <n-space justify="space-between">
-    <n-button text class="left carouselbtns" @click="prev">
-      &#10140;
-    </n-button>
-    <n-button text class="carouselbtns" @click="next">
-      &#10140;
-    </n-button>
-  </n-space>
+    </n-carousel>
+    <n-space justify="space-between" v-if="items.length > 1">
+      <n-button text class="left carouselbtns" @click="prev">
+        &#10140;
+      </n-button>
+      <n-button text class="carouselbtns" @click="next">
+        &#10140;
+      </n-button>
+    </n-space>
+  </div>
+  <div v-else>
+    <p class="no-media">No images or videos available.</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -76,5 +81,10 @@ img {
 
 .left {
   transform: rotate(180deg);
+}
+
+.no-media {
+  text-align: center;
+  font-style: italic;
 }
 </style>
