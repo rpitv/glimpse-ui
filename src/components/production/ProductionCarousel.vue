@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import type {Image, Video} from "@/graphql/types";
 import type {PropType} from "vue";
-import { ref } from "vue";
+import {ref, watchEffect} from "vue";
 import {NCarousel, NSpace, NButton} from "naive-ui";
 
 const props = defineProps({
@@ -35,6 +35,10 @@ const props = defineProps({
     required: true
   }
 });
+
+watchEffect(() => {
+  console.log(props.items);
+})
 
 const carousel = ref<InstanceType<typeof NCarousel> | null>(null);
 

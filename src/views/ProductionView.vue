@@ -1,7 +1,7 @@
 <template>
   <div class="card-wrapper">
     <n-card class="card">
-      <ProductionCarousel :items="sampleItems"/>
+      <ProductionCarousel :items="productionImagesAndVideos"/>
       <h1 class="prod-title">{{ production.result.value?.ReadProduction?.name }}</h1>
       <p class="prod-subtitle">{{ productionSubtitle }}</p>
       <p class="prod-description">{{ production.result.value?.ReadProduction?.description }}</p>
@@ -15,12 +15,13 @@
 import {NCard} from "naive-ui";
 import {useRoute} from "vue-router";
 import {useQuery} from "@vue/apollo-composable";
-import {Image, ReadProductionDocument, Video, VideoFormat} from "@/graphql/types";
+import {ProductionImage, ProductionVideo, ReadProductionDocument} from "@/graphql/types";
 import ProductionTags from "@/components/production/ProductionTags.vue";
 import ProductionCredits from "@/components/production/ProductionCredits.vue";
 import ProductionCarousel from "@/components/production/ProductionCarousel.vue";
 import {computed} from "vue";
 import moment from "moment";
+import type {DeepPartial} from "@/util/helper";
 
 const route = useRoute();
 
@@ -28,25 +29,36 @@ const production = useQuery(ReadProductionDocument, {
   id: route.params.id.toString()
 });
 
-const sampleItems: (
-  Pick<Video, "__typename" | "name" | "format" | "metadata"> |
-  Pick<Image, "__typename" | "name" | "description" | "path">
-  )[] = [
-  {
-    __typename: "Image",
-    name: "Image 1",
-    description: "Image 1 description",
-    path: "https://picsum.photos/200/300"
-  },
-  {
-    __typename: "Video",
-    name: "Video 1",
-    format: VideoFormat.Embed,
-    metadata: {
-      "url": "https://www.youtube.com/embed/P_ckAbOr0r4"
-    }
-  }
-]
+const productionImagesAndVideos = computed(() => {
+  const images = production.result.value?.ReadProduction?.images?.map((prodImage: DeepPartial<ProductionImage>) => {
+    return prodImage.image;
+  }) ?? [];
+  const videos = production.result.value?.ReadProduction?.videos?.map((prodVideo: DeepPartial<ProductionVideo>) => {
+    return prodVideo.video;
+  }) ?? [];
+
+  return [...images, ...videos];
+});
+//
+// const sampleItems: (
+//   Pick<Video, "__typename" | "name" | "format" | "metadata"> |
+//   Pick<Image, "__typename" | "name" | "description" | "path">
+//   )[] = [
+//   {
+//     __typename: "Image",
+//     name: "Image 1",
+//     description: "Image 1 description",
+//     path: "https://picsum.photos/200/300"
+//   },
+//   {
+//     __typename: "Video",
+//     name: "Video 1",
+//     format: VideoFormat.Embed,
+//     metadata: {
+//       "url": "https://www.youtube.com/embed/P_ckAbOr0r4"
+//     }
+//   }
+// ]
 
 /**
  * Subtitle of the production. Contains the category and start date/time of the production, if available.
