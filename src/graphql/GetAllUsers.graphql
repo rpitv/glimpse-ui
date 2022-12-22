@@ -10,6 +10,15 @@ query GetAllUsers($pagination: Pagination) {
       id
       name
     }
+    permissions {
+      id
+      action
+      subject
+      fields
+      conditions
+      inverted
+      reason
+    }
   }
 
 }

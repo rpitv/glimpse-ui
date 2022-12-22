@@ -1,5 +1,29 @@
 <template>
 <div>
+  <n-table>
+    <thead>
+    <tr>
+      <th>Action</th>
+      <th>Subjects</th>
+      <th>Fields</th>
+      <th>Conditions</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="permission of value">
+      <td><pre>{{permission.action.toUpperCase()}}</pre></td>
+      <td><pre>{{permission.subject.includes("all") ? "ALL" : permission.subject.join('\n')}}</pre></td>
+      <td><pre>{{permission.fields?.length ? permission.fields?.join('\n') : 'ALL'}}</pre></td>
+      <td><pre>{{permission.conditions ? JSON.stringify(permission.conditions) : 'NONE'}}</pre></td>
+      <td><n-button secondary circle type="error" aria-label="Delete" @click="deletePermissionClicked(permission)">
+        <template #icon>
+          <FontAwesomeIcon icon="fal fa-trash"/>
+        </template>
+      </n-button></td>
+    </tr>
+    </tbody>
+  </n-table>
   <h3>Create Permission</h3>
   <label>Action</label>
   <n-radio-group v-model:value="selectedAction">
@@ -16,9 +40,19 @@
 </template>
 
 <script setup lang="ts">
-import {NRadioGroup, NRadioButton, NTransfer, NButton} from "naive-ui";
-import {AbilityActions, AbilitySubjects} from "@/graphql/types";
-import {computed, ref} from "vue";
+import {NRadioGroup, NRadioButton, NTransfer, NButton, NTable} from "naive-ui";
+import {AbilityActions, AbilitySubjects, Permission} from "@/graphql/types";
+import {computed, PropType, ref} from "vue";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+
+const props = defineProps({
+  value: {
+    type: Array as PropType<Permission[]>,
+    required: true
+  }
+})
+
+const emit = defineEmits(['update:value'])
 
 const availableActions: AbilityActions[] = [
   AbilityActions.Create, AbilityActions.Read, AbilityActions.Update, AbilityActions.Delete, AbilityActions.Manage
@@ -69,6 +103,10 @@ const selectedSubjects = ref<AbilitySubjects[]>([]);
 
 function createPermissionClicked() {
   console.log(selectedAction.value, selectedSubjects.value);
+}
+
+function deletePermissionClicked(permission: Permission) {
+  console.log(permission);
 }
 
 </script>

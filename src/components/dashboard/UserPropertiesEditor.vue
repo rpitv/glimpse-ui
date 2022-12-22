@@ -14,7 +14,7 @@
       </n-grid-item>
       <n-grid-item>
         <h2>Permissions</h2>
-        <PermissionsEditor />
+        <PermissionsEditor :value="user.data.permissions" />
       </n-grid-item>
     </n-grid>
   </div>
