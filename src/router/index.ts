@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import ProductionsView from "../views/ProductionsView.vue";
+import ProductionView from "../views/ProductionView.vue";
 import ContactView from "../views/ContactView.vue";
 import LoginView from "../views/LoginView.vue";
 import DonateView from "../views/DonateView.vue";
@@ -124,9 +125,13 @@ const router = createRouter({
       },
     },
     {
-      path: "/productions",
-      name: "productions",
-      component: ProductionsView,
+      path: "/productions/:id",
+      name: "production",
+      component: restrictedComponent(
+        ProductionView,
+        AbilityActions.Read,
+        AbilitySubjects.Production
+      ),
       meta: {
         layoutCssName: "plain-layout",
       },

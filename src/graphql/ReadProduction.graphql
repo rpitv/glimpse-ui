@@ -1,0 +1,36 @@
+query ReadProduction($id: ID!) {
+  ReadProduction: findOneProduction(id: $id) {
+    name
+    description
+    startTime
+    credits {
+      id
+      person {
+        id
+        name
+      }
+      title
+      priority
+    }
+    category {
+      name
+    }
+    images {
+      image {
+        id
+        description
+        path
+      }
+    }
+    videos {
+      video {
+        name
+        format
+        metadata
+      }
+    }
+    tags {
+      tag
+    }
+  }
+}
