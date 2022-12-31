@@ -7,7 +7,10 @@
         <p class="prod-subtitle">{{ productionSubtitle }}</p>
         <p class="prod-description">{{ production.result.value?.ReadProduction?.description }}</p>
         <ProductionCredits :credits="production.result.value?.ReadProduction.credits"/>
-        <ProductionTags :tags="production.result.value?.ReadProduction?.tags.map(tag => tag.tag)"/>
+        <ProductionTags
+          v-if="production.result.value?.ReadProduction.tags.length > 0"
+          :tags="production.result.value?.ReadProduction?.tags.map(tag => tag.tag)"
+        />
       </div>
       <div v-else class="loading">
         <n-spin />
