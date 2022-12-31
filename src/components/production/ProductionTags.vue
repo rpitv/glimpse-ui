@@ -5,14 +5,9 @@
   <hr class="divider">
   <NCollapseTransition :show="show">
     <NSpace>
-      <div v-if="!tags.length > 0">
       <NButton v-for="tag in props.tags" :key="tag" color="#426779" style="color: #68b0d4" size="tiny">
         {{ tag }}
       </NButton>
-      </div>
-      <div v-else>
-        No tags available for this production.
-      </div>
     </NSpace>
   </NCollapseTransition>
 </template>
@@ -20,7 +15,7 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
-import { ref } from "vue";
+import {ref} from "vue";
 import {NCollapseTransition, NButton, NSpace} from "naive-ui"
 
 const show = ref<boolean>(false);
@@ -44,6 +39,7 @@ const props = defineProps({
   transition-duration: 0.25s;
   transform: rotate(-90deg);
 }
+
 .show {
   font-weight: bold;
   transition-duration: 0.25s;
