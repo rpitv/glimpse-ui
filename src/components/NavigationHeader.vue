@@ -75,28 +75,28 @@ const leftButtonsSource: Ref<NavButton[]> = computed(() => [
     showIconOnDesktop: false,
     route: "about"
   },
-  {
-    key: "contact",
-    name: "Contact Us",
-    icon: ['fal', 'envelope'],
-    showIconOnDesktop: false,
-    route: "contact",
-    visible: requirePermission(AbilityActions.Create, AbilitySubjects.ContactSubmission)
-  },
-  {
-    key: "join",
-    name: "Join the Club",
-    icon: ['fal', 'people-group'],
-    showIconOnDesktop: false,
-    route: "join"
-  },
-  {
-    key: "donate",
-    name: "Donate",
-    icon: ['fal', 'book-heart'],
-    showIconOnDesktop: false,
-    route: "donate"
-  }
+  // {
+  //   key: "contact",
+  //   name: "Contact Us",
+  //   icon: ['fal', 'envelope'],
+  //   showIconOnDesktop: false,
+  //   route: "contact",
+  //   visible: requirePermission(AbilityActions.Create, AbilitySubjects.ContactSubmission)
+  // },
+  // {
+  //   key: "join",
+  //   name: "Join the Club",
+  //   icon: ['fal', 'people-group'],
+  //   showIconOnDesktop: false,
+  //   route: "join"
+  // },
+  // {
+  //   key: "donate",
+  //   name: "Donate",
+  //   icon: ['fal', 'book-heart'],
+  //   showIconOnDesktop: false,
+  //   route: "donate"
+  // }
 ]);
 // Define the list of buttons to render on the right side of the navbar
 const rightButtonsSource: Ref<NavButton[]> = computed(() => {
