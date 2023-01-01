@@ -1,15 +1,8 @@
 <template>
-  <div v-if="incomplete">
-    <Incomplete />
-  </div>
+<div></div>
 </template>
 
 <script setup lang="ts">
-
-import Incomplete from "@/components/Incomplete.vue";
-import { ref } from "vue";
-
-const incomplete = ref<boolean>(true);
 
 </script>
 
