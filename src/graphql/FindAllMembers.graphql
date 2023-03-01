@@ -1,0 +1,14 @@
+query FindAllMembers ($filter: FilterRoleInput, $order: OrderRoleInput!){
+  findManyRole (filter: $filter, order: [$order]) {
+    name
+    people {
+      person {
+        name
+        profilePictureId
+        profilePicture {
+          path
+        }
+      }
+    }
+  }
+}

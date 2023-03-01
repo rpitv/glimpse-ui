@@ -660,8 +660,14 @@ export type CreateRedirectInput = {
 export type CreateRoleInput = {
   /** The optional description of this role. May be what people within this role are responsible for, for example. */
   description?: InputMaybe<Scalars['String']>;
+  /** Flag for whether this Role should be displayed in the leadership section on the website's "About Us" page. */
+  displayInLeadership?: InputMaybe<Scalars['Boolean']>;
+  /** Flag for whether this Role should be displayed in the membership section on the website's "About Us" page. */
+  displayInMembership?: InputMaybe<Scalars['Boolean']>;
   /** The name of this role. */
   name?: InputMaybe<Scalars['String']>;
+  /** Priority of this Role when displayed on the "About Us" page or next to other Role's on a Person's profile. */
+  priority?: InputMaybe<Scalars['Int']>;
 };
 
 /** Input type for createCategory mutation */
@@ -1127,6 +1133,10 @@ export type FilterRoleInput = {
   OR?: InputMaybe<Array<FilterRoleInput>>;
   /** Filter by the description of this Role. */
   description?: InputMaybe<StringComparisonInput>;
+  /** Filter by whether this Role should be displayed in the leadership section on the website's "About Us" page. */
+  displayInLeadership?: InputMaybe<BooleanComparisonInput>;
+  /** Filter by whether this Role should be displayed in the membership section on the website's "About Us" page. */
+  displayInMembership?: InputMaybe<BooleanComparisonInput>;
   /** Filter by ID */
   id?: InputMaybe<NumberComparisonInput>;
   /** Filter by the name of this Role. */
@@ -1323,6 +1333,7 @@ export type ImagePeopleArgs = {
 
 export type ImageProductionsArgs = {
   filter?: InputMaybe<FilterProductionImageInput>;
+  order?: InputMaybe<Array<OrderProductionImageInput>>;
   pagination?: InputMaybe<PaginationInput>;
 };
 
@@ -1834,6 +1845,7 @@ export type NumberComparisonInput = {
   equals?: InputMaybe<Scalars['Float']>;
   gt?: InputMaybe<Scalars['Float']>;
   gte?: InputMaybe<Scalars['Float']>;
+  in?: InputMaybe<Array<Scalars['Float']>>;
   lt?: InputMaybe<Scalars['Float']>;
   lte?: InputMaybe<Scalars['Float']>;
   not?: InputMaybe<Scalars['Float']>;
@@ -1948,6 +1960,14 @@ export type OrderPersonRoleInput = {
   field: PersonRoleOrderableFields;
 };
 
+/** Input type for ordering Categories in ReadMany queries. */
+export type OrderProductionImageInput = {
+  /** Direction to order in. Required. */
+  direction: OrderDirection;
+  /** Name of the field to sort by. */
+  field: ProductionImageOrderableFields;
+};
+
 /** Input type for ordering Productions in ReadMany queries. */
 export type OrderProductionInput = {
   /** Direction to order in. Required. */
@@ -1970,6 +1990,14 @@ export type OrderProductionTagInput = {
   direction: OrderDirection;
   /** Name of the field to sort by. */
   field: ProductionTagOrderableFields;
+};
+
+/** Input type for ordering Categories in ReadMany queries. */
+export type OrderProductionVideoInput = {
+  /** Direction to order in. Required. */
+  direction: OrderDirection;
+  /** Name of the field to sort by. */
+  field: ProductionVideoOrderableFields;
 };
 
 /** Input type for ordering Redirects in ReadMany queries. */
@@ -2052,6 +2080,7 @@ export type Person = {
   images?: Maybe<Array<PersonImage>>;
   /** The name (or pseudonym) for this Person. Should likely be in the format "First Last". */
   name?: Maybe<Scalars['String']>;
+  profilePicture?: Maybe<Image>;
   /** ID of the image which should be used for this Person's profile picture. */
   profilePictureId?: Maybe<Scalars['BigInt']>;
   /** The pronouns for this Person. Should likely be in the format "they/them". Optional. */
@@ -2191,6 +2220,7 @@ export type ProductionCreditsArgs = {
 
 export type ProductionImagesArgs = {
   filter?: InputMaybe<FilterProductionImageInput>;
+  order?: InputMaybe<Array<OrderProductionImageInput>>;
   pagination?: InputMaybe<PaginationInput>;
 };
 
@@ -2211,6 +2241,7 @@ export type ProductionTagsArgs = {
 
 export type ProductionVideosArgs = {
   filter?: InputMaybe<FilterProductionVideoInput>;
+  order?: InputMaybe<Array<OrderProductionVideoInput>>;
   pagination?: InputMaybe<PaginationInput>;
 };
 
@@ -2227,6 +2258,10 @@ export type ProductionImage = {
   /** ID of the production this ProductionImage is associated with. */
   productionId?: Maybe<Scalars['BigInt']>;
 };
+
+export enum ProductionImageOrderableFields {
+  Priority = 'priority'
+}
 
 export enum ProductionOrderableFields {
   CategoryId = 'categoryId',
@@ -2285,6 +2320,10 @@ export type ProductionVideo = {
   /** ID of the video this ProductionVideo is associated with. */
   videoId?: Maybe<Scalars['BigInt']>;
 };
+
+export enum ProductionVideoOrderableFields {
+  Priority = 'priority'
+}
 
 export type Query = {
   __typename?: 'Query';
@@ -2840,11 +2879,17 @@ export type Role = {
   __typename?: 'Role';
   /** The optional description of this role. May be what people within this role are responsible for, for example. */
   description?: Maybe<Scalars['String']>;
+  /** Flag for whether this Role should be displayed in the leadership section on the website's "About Us" page. */
+  displayInLeadership?: Maybe<Scalars['Boolean']>;
+  /** Flag for whether this Role should be displayed in the membership section on the website's "About Us" page. */
+  displayInMembership?: Maybe<Scalars['Boolean']>;
   /** Unique ID for this Role. Automatically generated. */
   id?: Maybe<Scalars['BigInt']>;
   /** The name of this role. */
   name?: Maybe<Scalars['String']>;
   people?: Maybe<Array<PersonRole>>;
+  /** Priority of this Role when displayed on the "About Us" page or next to other Role's on a Person's profile. */
+  priority?: Maybe<Scalars['Int']>;
 };
 
 
@@ -2856,7 +2901,8 @@ export type RolePeopleArgs = {
 
 export enum RoleOrderableFields {
   Id = 'id',
-  Name = 'name'
+  Name = 'name',
+  Priority = 'priority'
 }
 
 export type RuleOptions = {
@@ -2895,6 +2941,7 @@ export type StringComparisonInput = {
   contains?: InputMaybe<Scalars['String']>;
   endsWith?: InputMaybe<Scalars['String']>;
   equals?: InputMaybe<Scalars['String']>;
+  in?: InputMaybe<Array<Scalars['String']>>;
   mode?: InputMaybe<CaseSensitivity>;
   not?: InputMaybe<Scalars['String']>;
   startsWith?: InputMaybe<Scalars['String']>;
@@ -3233,8 +3280,14 @@ export type UpdateRedirectInput = {
 export type UpdateRoleInput = {
   /** The optional description of this role. May be what people within this role are responsible for, for example. */
   description?: InputMaybe<Scalars['String']>;
+  /** Flag for whether this Role should be displayed in the leadership section on the website's "About Us" page. */
+  displayInLeadership?: InputMaybe<Scalars['Boolean']>;
+  /** Flag for whether this Role should be displayed in the membership section on the website's "About Us" page. */
+  displayInMembership?: InputMaybe<Scalars['Boolean']>;
   /** The name of this role. */
   name?: InputMaybe<Scalars['String']>;
+  /** Priority of this Role when displayed on the "About Us" page or next to other Role's on a Person's profile. */
+  priority?: InputMaybe<Scalars['Int']>;
 };
 
 /** Input type for updateUser mutation. Null values are not updated. To update a non-null value to null, explicitly pass null. */
@@ -3453,12 +3506,13 @@ export type Video = {
   metadata?: Maybe<Scalars['JSON']>;
   /** The display name for this Video. */
   name?: Maybe<Scalars['String']>;
-  videoFor?: Maybe<Array<ProductionVideo>>;
+  productions?: Maybe<Array<ProductionVideo>>;
 };
 
 
-export type VideoVideoForArgs = {
+export type VideoProductionsArgs = {
   filter?: InputMaybe<FilterProductionVideoInput>;
+  order?: InputMaybe<Array<OrderProductionVideoInput>>;
   pagination?: InputMaybe<PaginationInput>;
 };
 
@@ -3519,6 +3573,14 @@ export enum VoteResponseOrderableFields {
   Timestamp = 'timestamp'
 }
 
+export type FindAllMembersQueryVariables = Exact<{
+  filter?: InputMaybe<FilterRoleInput>;
+  order: OrderRoleInput;
+}>;
+
+
+export type FindAllMembersQuery = { __typename?: 'Query', findManyRole: Array<{ __typename?: 'Role', name?: string | null, people?: Array<{ __typename?: 'PersonRole', person?: { __typename?: 'Person', name?: string | null, profilePictureId?: any | null, profilePicture?: { __typename?: 'Image', path?: string | null } | null } | null }> | null }> };
+
 export type FindAllProductionsQueryVariables = Exact<{
   pagination?: InputMaybe<PaginationInput>;
 }>;
@@ -3572,6 +3634,7 @@ export type StopStreamMutationVariables = Exact<{
 export type StopStreamMutation = { __typename?: 'Mutation', deleteStream: { __typename?: 'Stream', id?: any | null } };
 
 
+export const FindAllMembersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindAllMembers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FilterRoleInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderRoleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyRole"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"Variable","name":{"kind":"Name","value":"order"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"people"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"person"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"profilePictureId"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicture"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FindAllMembersQuery, FindAllMembersQueryVariables>;
 export const FindAllProductionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindAllProductions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"productions"},"name":{"kind":"Name","value":"findManyProduction"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"thumbnail"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"path"}}]}}]}}]}}]} as unknown as DocumentNode<FindAllProductionsQuery, FindAllProductionsQueryVariables>;
 export const ListStreamsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListStreams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"findManyStream"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ListStreamsQuery, ListStreamsQueryVariables>;
 export const LoginLocalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LoginLocal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginLocal"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<LoginLocalMutation, LoginLocalMutationVariables>;
