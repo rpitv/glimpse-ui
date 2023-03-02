@@ -1,8 +1,9 @@
-query FindAllMembers ($filter: FilterRoleInput, $order: OrderRoleInput!){
-  findManyRole (filter: $filter, order: [$order]) {
+query FindAboutPageMembers($filter: FilterRoleInput!) {
+  findManyRole (filter: $filter, order: [{ field: priority, direction: Desc }]) {
     name
-    people {
+    people(order: [{ field: startTime, direction: Asc }]) {
       person {
+        id
         name
         profilePictureId
         profilePicture {

@@ -34,16 +34,16 @@
     <ul>
       <h2>Leadership</h2>
       <n-grid :cols="3">
-        <n-grid-item v-for="officer in leadershipRole.result.value?.findManyRole">
-          <Person :role="officer"/>
+        <n-grid-item v-for="leader in leadershipPeople">
+          <PersonCard :person="leader" :displayed-role="leader.displayedRole"/>
         </n-grid-item>
       </n-grid>
     </ul>
     <ul>
       <h2>Members</h2>
       <n-grid :cols="3">
-        <n-grid-item v-for="member in memberRole.result.value?.findManyRole">
-          <Person :role="member"/>
+        <n-grid-item v-for="member in membershipPeople">
+          <PersonCard :person="member" :displayed-role="member.displayedRole"/>
         </n-grid-item>
       </n-grid>
     </ul>
@@ -52,35 +52,74 @@
 
 <script setup lang="ts">
 import { NGrid, NGridItem } from "naive-ui";
-import Person from "@/components/Person.vue";
+import PersonCard from "@/components/PersonCard.vue";
 import { useQuery } from "@vue/apollo-composable";
-import { FindAllMembersDocument, OrderDirection, RoleOrderableFields } from "@/graphql/types";
+import { FindAboutPageMembersDocument, Person } from "@/graphql/types";
+import { computed } from "vue";
 
-const leadershipRole = useQuery(FindAllMembersDocument, {
+const leadershipRoles = useQuery(FindAboutPageMembersDocument, {
   filter: {
     displayInLeadership: {
       equals: true
     }
-  },
-  order: {
-    field: RoleOrderableFields.Priority,
-    direction: OrderDirection.Desc
   }
 });
 
-const memberRole = useQuery(FindAllMembersDocument, {
+const membershipRoles = useQuery(FindAboutPageMembersDocument, {
   filter: {
     displayInMembership: {
       equals: true
     }
-  },
-  order: {
-    field: RoleOrderableFields.Priority,
-    direction: OrderDirection.Desc
   }
 });
 
-console.log(memberRole);
+// leadershipPeople is a mutated form of leadershipRoles which has all the people in the given roles, with the role
+//  name attached to each person in the "displayedRole" field. Order is maintained.
+const leadershipPeople = computed<(Person & { displayedRole?: string | null })[]>(() => {
+  // If the query hasn't finished yet or there are no roles, return an empty list
+  if (!leadershipRoles.result.value?.findManyRole) {
+    return [];
+  }
+  // Otherwise, reduce the list of roles to a list of all the people in those roles, with the role name attached
+  //  to each person in the "displayedRole" field. The same person cannot be in the list twice.
+  return leadershipRoles.result.value.findManyRole.reduce<(Person & { displayedRole?: string | null })[]>((acc, role) => {
+    for (const personRole of role.people ?? []) {
+      // Filter out people who we couldn't retrieve from the API, and people who are already in the list
+      if (!personRole?.person || acc.findIndex(p => p.id === personRole?.person?.id) !== -1) {
+        continue;
+      }
+      acc.push({
+        displayedRole: role.name,
+        ...personRole.person
+      });
+    }
+    return acc;
+  }, []);
+});
+
+// membershipPeople is a mutated form of membershipRoles which has all the people in the given roles, with the role
+//  name attached to each person in the "displayedRole" field. Order is maintained.
+const membershipPeople = computed<(Person & { displayedRole?: string | null })[]>(() => {
+  // If the query hasn't finished yet or there are no roles, return an empty list
+  if(!membershipRoles.result.value?.findManyRole) {
+    return [];
+  }
+  // Otherwise, reduce the list of roles to a list of all the people in those roles, with the role name attached
+  //  to each person in the "displayedRole" field. The same person cannot be in the list twice.
+  return membershipRoles.result.value.findManyRole.reduce<(Person & { displayedRole?: string | null })[]>((acc, role) => {
+    for(const personRole of role.people ?? []) {
+      // Filter out people who we couldn't retrieve from the API, and people who are already in the list
+      if (!personRole?.person || acc.findIndex(p => p.id === personRole?.person?.id) !== -1) {
+          continue;
+      }
+      acc.push({
+        displayedRole: role.name,
+        ...personRole.person
+      });
+    }
+    return acc;
+  }, []);
+})
 
 </script>
 
