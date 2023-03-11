@@ -1831,6 +1831,7 @@ input NumberComparisonInput {
   equals: Float
   gt: Float
   gte: Float
+  in: [Float!]
   lt: Float
   lte: Float
   not: Float
@@ -2041,6 +2042,7 @@ input StringComparisonInput {
   contains: String
   endsWith: String
   equals: String
+  in: [String!]
   mode: CaseSensitivity
   not: String
   startsWith: String

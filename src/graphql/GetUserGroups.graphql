@@ -1,4 +1,4 @@
-query GetUserGroups($user: ID!) {
+query GetUserGroups($user: BigInt!) {
   User: findOneUser(id: $user) {
     groups {
       id

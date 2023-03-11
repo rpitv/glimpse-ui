@@ -1,4 +1,4 @@
-mutation EditUser($id: ID!, $input: UserUpdateInput!) {
+mutation EditUser($id: BigInt!, $input: UpdateUserInput!) {
   updateUser(id: $id, input: $input) {
     id
   }

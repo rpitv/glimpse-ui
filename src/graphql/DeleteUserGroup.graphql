@@ -1,4 +1,4 @@
-mutation DeleteUserGroup($id: ID!) {
+mutation DeleteUserGroup($id: BigInt!) {
   DeleteUserGroup: deleteUserGroup(id: $id) {
     id
   }

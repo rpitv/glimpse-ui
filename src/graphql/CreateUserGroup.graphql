@@ -1,4 +1,4 @@
-mutation CreateUserGroup($userId: ID!, $groupId: ID!) {
+mutation CreateUserGroup($userId: BigInt!, $groupId: BigInt!) {
   CreateUserGroup: createUserGroup(input: {groupId: $groupId, userId: $userId}) {
     id
   }

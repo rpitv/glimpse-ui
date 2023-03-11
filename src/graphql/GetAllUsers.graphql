@@ -1,5 +1,5 @@
-query GetAllUsers($pagination: Pagination) {
-  userCount: countUser
+query GetAllUsers($pagination: PaginationInput) {
+  userCount,
   GetAllUsers: findManyUser(pagination: $pagination) {
     id
     username

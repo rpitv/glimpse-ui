@@ -1,12 +1,10 @@
-query GetAllPeople($pagination: Pagination) {
-  personCount: countPerson
+query GetAllPeople($pagination: PaginationInput) {
+  personCount
   GetAllPeople: findManyPerson(pagination: $pagination) {
     id
     name
     pronouns
     graduation
-    start
-    end
     description
   }
 
