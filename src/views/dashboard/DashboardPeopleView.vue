@@ -30,10 +30,10 @@ import {computed, h, ref, Ref} from "vue";
 import moment from "moment";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
-  AbilityActions, AbilitySubjects, CreateNewPersonDocument,
+  AbilitySubjects, CreateNewPersonDocument,
   DeletePersonDocument, EditPersonDocument, GetAllPeopleDocument
 } from "@/graphql/types";
-import {useGlimpseAbility} from "@/casl";
+import { AbilityActions, useGlimpseAbility } from "@/casl";
 import {subject} from "@casl/ability";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
 
@@ -140,47 +140,6 @@ const tableFields: CMSField<Person>[] = [
     }
   },
   {
-    name: 'Start Date',
-    key: 'start',
-    readable: true,
-    creatable: true,
-    editable: true,
-    renderEditInput: () => {
-      return h(NDatePicker, {type: 'date'});
-    },
-    renderTableCell(row: RowData) {
-      return h('span', {}, moment(row.start).format('YYYY-MM-DD'));
-    },
-    inputValueTransformer(value: string): number|null {
-      return value ? new Date(value).getTime() : null;
-    },
-    outputValueTransformer(value: number): string|null {
-      return value ? new Date(value).toISOString() : null;
-    },
-    rules: [
-      {required: true, message: 'Start date is required', trigger: ['blur', 'input']}
-    ]
-  },
-  {
-    name: 'End Date',
-    key: 'end',
-    readable: true,
-    creatable: true,
-    editable: true,
-    renderEditInput: () => {
-      return h(NDatePicker, {type: 'date', clearable: true});
-    },
-    renderTableCell(row: RowData) {
-      return row.end ? h('span', {}, moment(row.end).format('YYYY-MM-DD')) : '';
-    },
-    inputValueTransformer(value: string): number|null {
-      return value ? new Date(value).getTime() : null;
-    },
-    outputValueTransformer(value: number): string|null {
-      return value ? new Date(value).toISOString() : null;
-    }
-  },
-  {
     name: 'Description',
     key: 'description',
     readable: false,
@@ -206,8 +165,6 @@ const tableData: Ref<CMSItem<Person>[]> = computed(() => {
             name: data.name === person.name ? undefined : data.name ?? null,
             pronouns: data.pronouns === person.pronouns ? undefined : data.pronouns ?? null,
             graduation: data.graduation === person.graduation ? undefined : data.graduation ?? null,
-            start: data.start === person.start ? undefined : data.start ?? null,
-            end: data.end === person.end ? undefined : data.end ?? null,
             description: data.description === person.description ? undefined : data.description ?? null,
           }
         });
@@ -228,8 +185,6 @@ function create(data: any) {
       name: data.name,
       pronouns: data.pronouns ?? undefined,
       graduation: data.graduation ?? undefined,
-      start: data.start ?? undefined,
-      end: data.end ?? undefined,
       description: data.description ?? undefined,
     }
   });

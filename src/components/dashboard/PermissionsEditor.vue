@@ -41,9 +41,10 @@
 
 <script setup lang="ts">
 import {NRadioGroup, NRadioButton, NTransfer, NButton, NTable} from "naive-ui";
-import {AbilityActions, AbilitySubjects, Permission} from "@/graphql/types";
+import {AbilitySubjects, Permission} from "@/graphql/types";
 import {computed, PropType, ref} from "vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import { AbilityActions } from "@/casl";
 
 const props = defineProps({
   value: {
@@ -59,36 +60,7 @@ const availableActions: AbilityActions[] = [
 ];
 const selectedAction = ref<AbilityActions>(AbilityActions.Create);
 
-const availableSubjects: AbilitySubjects[] = [
-  AbilitySubjects.AccessLog,
-  AbilitySubjects.AlertLog,
-  AbilitySubjects.Asset,
-  AbilitySubjects.AuditLog,
-  AbilitySubjects.BlogPost,
-  AbilitySubjects.Category,
-  AbilitySubjects.ContactSubmission,
-  AbilitySubjects.ContactSubmissionAssignee,
-  AbilitySubjects.Credit,
-  AbilitySubjects.Group,
-  AbilitySubjects.GroupPermission,
-  AbilitySubjects.Image,
-  AbilitySubjects.Person,
-  AbilitySubjects.PersonImage,
-  AbilitySubjects.Production,
-  AbilitySubjects.ProductionImage,
-  AbilitySubjects.ProductionRsvp,
-  AbilitySubjects.ProductionTag,
-  AbilitySubjects.ProductionVideo,
-  AbilitySubjects.Redirect,
-  AbilitySubjects.Role,
-  AbilitySubjects.Stream,
-  AbilitySubjects.User,
-  AbilitySubjects.UserGroup,
-  AbilitySubjects.UserPermission,
-  AbilitySubjects.Video,
-  AbilitySubjects.Vote,
-  AbilitySubjects.VoteResponse
-];
+const availableSubjects: AbilitySubjects[] = Object.values(AbilitySubjects);
 
 const subjectsOptions = computed(() => {
   return availableSubjects.map(subject => {

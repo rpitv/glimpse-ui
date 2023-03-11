@@ -1,10 +1,40 @@
-import type { AbilityClass } from "@casl/ability";
+import type { AbilityClass, InferSubjects } from "@casl/ability";
 import { Ability, AbilityBuilder } from "@casl/ability";
 import { ABILITY_TOKEN, useAbility } from "@casl/vue";
 import type { InjectionKey, Ref } from "vue";
 import { computed } from "vue";
 import {
-  AbilitySubjects,
+  AbilitySubjects
+} from "@/graphql/types";
+import type {
+  User,
+  AccessLog,
+  AlertLog,
+  Asset,
+  AuditLog,
+  BlogPost,
+  Category,
+  ContactSubmission,
+  Credit,
+  Group,
+  GroupPermission,
+  Image,
+  Person,
+  PersonImage,
+  PersonRole,
+  Production,
+  ProductionImage,
+  ProductionRsvp,
+  ProductionTag,
+  ProductionVideo,
+  Redirect,
+  Role,
+  Stream,
+  UserGroup,
+  UserPermission,
+  Video,
+  Vote,
+  VoteResponse
 } from "@/graphql/types";
 import { useAuthStore } from "@/stores/auth";
 
@@ -18,7 +48,37 @@ export enum AbilityActions {
   Filter = "filter",
 }
 
-export type GlimpseAbility = Ability<[AbilityActions, AbilitySubjects]>;
+type AbilitySubjectTypes =
+  User |
+  AccessLog |
+  AlertLog |
+  Asset |
+  AuditLog |
+  BlogPost |
+  Category |
+  ContactSubmission |
+  Credit |
+  Group |
+  GroupPermission |
+  Image |
+  Person |
+  PersonImage |
+  PersonRole |
+  ProductionImage |
+  ProductionRsvp |
+  ProductionTag |
+  ProductionVideo |
+  Production |
+  Redirect |
+  Role |
+  Stream |
+  UserGroup |
+  UserPermission |
+  Video |
+  Vote |
+  VoteResponse;
+
+export type GlimpseAbility = Ability<[AbilityActions, InferSubjects<AbilitySubjectTypes, true> | AbilitySubjects]>;
 
 export const GlimpseAbility = Ability as AbilityClass<GlimpseAbility>;
 export const TOKEN = ABILITY_TOKEN as InjectionKey<GlimpseAbility>;

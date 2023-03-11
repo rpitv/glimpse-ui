@@ -38,13 +38,12 @@ import type {Person, User} from "@/graphql/types";
 import {computed, h, ref, Ref, VNode} from "vue";
 import {useMutation, useQuery} from "@vue/apollo-composable";
 import {
-  AbilityActions,
   AbilitySubjects,
   CreateNewUserDocument, DeleteUserDocument,
   EditUserDocument, GetAllPeopleDocument,
   GetAllUsersDocument
 } from "@/graphql/types";
-import {useGlimpseAbility} from "@/casl";
+import { AbilityActions, useGlimpseAbility } from "@/casl";
 import {subject} from "@casl/ability";
 import type {RowData} from "naive-ui/es/data-table/src/interface";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
@@ -64,7 +63,7 @@ const extraActions = [{
   name: 'Change Password',
   type: 'info',
   enabled(row: RowData) {
-    return ability.can(AbilityActions.Update, subject(AbilitySubjects.User, row), 'password');
+    return ability.can(AbilityActions.Update, subject(AbilitySubjects.User, row) as any, 'password');
   },
   callback(row: RowData) {
     console.log(row);
@@ -118,7 +117,7 @@ people.onError((error) => {
   message.error('Failed to fetch people');
 });
 
-const peopleDropdownOptions = computed(() => {
+const peopleDropdownOptions = computed<any[]>(() => { // TODO: fix type
   return people.result.value?.GetAllPeople.map((person) => {
     return {
       label: person.name,
