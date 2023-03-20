@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="avatar-container">
-      <n-avatar size="300" v-if="person.profilePicture?.path" :src="person.profilePicture.path"></n-avatar>
-      <n-avatar size="300" v-else src="/default_thumbnail_300.png" />
+      <img style="max-width: 250px" v-if="person.profilePicture?.path" :src="person.profilePicture.path" />
+      <img style="max-width: 250px" v-else src="/default_thumbnail_300.png" />
     </div>
     <p class="name">{{person.name}}</p>
     <p v-if="displayedRole" class="role">{{displayedRole}}</p>
@@ -33,5 +33,10 @@ defineProps({
 }
 .name {
   text-align: center;
+  font-weight: bold;
+}
+.role {
+  text-align: center;
+  color: #ff7676;
 }
 </style>

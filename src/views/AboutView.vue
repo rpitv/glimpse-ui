@@ -3,9 +3,9 @@
     <h1 class="title">
       About Us
     </h1>
-    <NGrid :cols="2">
+    <NGrid cols="1 800:2">
       <n-grid-item>
-        <p>
+        <p class="info">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ac orci vestibulum, fermentum lorem accumsan,
           aliquet turpis. Donec lectus diam, tincidunt ut eleifend et, dignissim at ipsum. Integer interdum luctus
           sapien, in finibus leo condimentum lobortis. Sed nibh mauris, semper at magna sit amet, ornare pulvinar
@@ -16,24 +16,24 @@
           rhoncus mi. Integer ac finibus nunc. Etiam eget euismod nisl. Aliquam non tempus nisi, a gravida magna. Morbi
           vitae tellus nisl.
         </p>
-        <h1>Policy</h1>
-        <ul>
-          <li>
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">RPI TV CONSITUTION</a>
-          </li>
-          <li>
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Rensselaer Union Media Statement</a>
-          </li>
-        </ul>
       </n-grid-item>
       <n-grid-item class="video-flex">
         <iframe class="player" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allowfullscreen/>
       </n-grid-item>
     </NGrid>
+    <h1>Policy</h1>
+    <ul>
+      <li>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">RPI TV CONSITUTION</a>
+      </li>
+      <li>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Rensselaer Union Media Statement</a>
+      </li>
+    </ul>
     <h1>Our Team</h1>
     <ul>
       <h2>Leadership</h2>
-      <n-grid :cols="3">
+      <n-grid cols="1 500:2 750:3 1000:4 1250:5 1500:6">
         <n-grid-item v-for="leader in leadershipPeople">
           <PersonCard :person="leader" :displayed-role="leader.displayedRole"/>
         </n-grid-item>
@@ -41,7 +41,7 @@
     </ul>
     <ul>
       <h2>Members</h2>
-      <n-grid :cols="3">
+      <n-grid cols="1 500:2 750:3 1000:4 1250:5 1500:6">
         <n-grid-item v-for="member in membershipPeople">
           <PersonCard :person="member" :displayed-role="member.displayedRole"/>
         </n-grid-item>
@@ -124,14 +124,17 @@ const membershipPeople = computed<(Person & { displayedRole?: string | null })[]
 </script>
 
 <style scoped lang="scss">
+.info {
+  width: 95%;
+}
 .video-flex {
   display: flex;
   justify-content: center;
 }
 .player {
   aspect-ratio: 16 / 9;
-  height: 80%;
-  width: 80%;
+  height: 100%;
+  width: 100%;
   border: 0px;
 }
 a {
