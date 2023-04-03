@@ -1,5 +1,5 @@
 <template>
-  <RouterPopup :max-width="900">
+  <RouterPopup :max-width="900" :modal="false">
     <div class="card-wrapper">
       <n-card class="card">
         <div v-if="sourceData.loading.value">Loading...</div>

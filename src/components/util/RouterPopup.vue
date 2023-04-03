@@ -1,7 +1,7 @@
 <template>
   <div>
     <n-modal
-      v-if="routeStore.hasSwitchedRoutes"
+      v-if="modal"
       v-model:show="showModal"
       :closable="true"
       @close="showModal = false"
@@ -32,6 +32,10 @@ const props = defineProps({
   maxWidth: {
     type: Number,
     default: 500,
+  },
+  modal: {
+    type: Boolean,
+    default: false,
   },
 });
 

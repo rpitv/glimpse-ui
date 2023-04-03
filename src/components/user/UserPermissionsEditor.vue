@@ -1,5 +1,5 @@
 <template>
-  <RouterPopup :max-width="1000">
+  <RouterPopup :max-width="1000" :modal="true">
     <div class="spinner-wrapper" v-if="userPermissionsQuery.loading.value">
       <n-spin>
         <template #description>

@@ -1,9 +1,7 @@
 <template>
   <div>
     <router-view />
-    <UserList
-      v-if="routeStore.hasSwitchedRoutes || route.name === 'dashboard-users'"
-    />
+    <UserList v-if="route.name === 'dashboard-users'" />
   </div>
 </template>
 

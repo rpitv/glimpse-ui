@@ -1,5 +1,5 @@
 <template>
-  <RouterPopup :max-width="400">
+  <RouterPopup :max-width="400" :modal="true">
     <n-card>
       <h1>Change Password</h1>
 

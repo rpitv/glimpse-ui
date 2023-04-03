@@ -1,5 +1,5 @@
 <template>
-  <RouterPopup :max-width="1100">
+  <RouterPopup :max-width="1100" :modal="true">
     <n-card class="create-user-card">
       <h1>Create User</h1>
       <div class="steps">
