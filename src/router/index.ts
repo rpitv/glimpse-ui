@@ -51,13 +51,14 @@ import { h } from "vue";
 import { AbilitySubjects } from "@/graphql/types";
 import { DashboardPageCategory } from "@/util";
 import DashboardComingSoon from "@/components/dashboard/DashboardComingSoon.vue";
-import DashboardUserPage from "@/components/dashboard/DashboardUserPage.vue";
-import UserList from "@/components/user/UserList.vue";
-import DashboardEditUserPage from "@/components/dashboard/DashboardEditUserPage.vue";
 import { useAuthStore } from "@/stores/auth";
 import CreateUserCard from "@/components/user/CreateUserCard.vue";
 import ChangePasswordCard from "@/components/user/ChangePasswordCard.vue";
 import DashboardRolesPage from "@/components/dashboard/DashboardRolesPage.vue";
+import UserPermissionsEditor from "@/components/user/UserPermissionsEditor.vue";
+import UserDetailsCard from "@/components/user/UserDetailsCard.vue";
+import UserInputCard from "@/components/user/UserInputCard.vue";
+import { useRouteStore } from "@/stores/route";
 
 function restrictedComponent(
   component: Component,
@@ -97,550 +98,626 @@ function restrictedComponent(
   }
 }
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    } else {
-      return { top: 0, behavior: "smooth" };
-    }
-  },
-  routes: [
-    {
-      path: "/",
-      name: "home",
-      component: HomeView,
-      meta: {
-        layoutCssName: "wave-layout",
-      },
+export function instantiateRouter() {
+  const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    scrollBehavior(to, from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      } else {
+        return { top: 0, behavior: "smooth" };
+      }
     },
-    {
-      path: "/about",
-      name: "about",
-      component: AboutView,
-      meta: {
-        layoutCssName: "plain-layout",
-      },
-    },
-    {
-      path: "/productions",
-      name: "productions",
-      component: restrictedComponent(
-        ProductionsView,
-        AbilityActions.Read,
-        AbilitySubjects.Production
-      ),
-      meta: {
-        layoutCssName: "plain-layout",
-      },
-    },
-    {
-      path: "/productions",
-      name: "productions",
-      component: ProductionsView,
-      meta: {
-        layoutCssName: "plain-layout",
-      },
-    },
-    {
-      path: "/contact",
-      name: "contact",
-      component: restrictedComponent(
-        ContactView,
-        AbilityActions.Create,
-        AbilitySubjects.ContactSubmission
-      ),
-      meta: {
-        layoutCssName: "wave-layout",
-      },
-    },
-    {
-      path: "/login",
-      name: "login",
-      component: LoginView,
-      meta: {
-        layoutCssName: "wave-layout",
-      },
-    },
-    {
-      path: "/donate",
-      name: "donate",
-      component: DonateView,
-      meta: {
-        layoutCssName: "wave-layout",
-      },
-    },
-    {
-      path: "/join",
-      name: "join",
-      component: JoinView,
-      meta: {
-        layoutCssName: "wave-layout",
-      },
-    },
-    {
-      path: "/dashboard",
-      name: "dashboard-parent",
-      component: restrictedComponent(
-        DashboardView,
-        () => canViewDashboard().value
-      ),
-      meta: {
-        layoutCssName: "plain-layout",
-      },
-      children: [
-        {
-          path: "",
-          name: "dashboard",
-          component: restrictedComponent(
-            DashboardComingSoon,
-            () => canViewDashboard().value
-          ),
-          meta: {
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-            ],
-          },
+    routes: [
+      {
+        path: "/",
+        name: "home",
+        component: HomeView,
+        meta: {
+          layoutCssName: "wave-layout",
         },
-        {
-          path: "assets",
-          name: "dashboard-assets",
-          component: restrictedComponent(DashboardAssetsPage, () =>
-            canViewAssetsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Assets",
-              icon: "fa-light fa-box-open-full",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewAssetsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-assets" }, name: "Assets" },
-            ],
-          },
+      },
+      {
+        path: "/about",
+        name: "about",
+        component: AboutView,
+        meta: {
+          layoutCssName: "plain-layout",
         },
-        {
-          path: "blog-posts",
-          name: "dashboard-blog-posts",
-          component: restrictedComponent(DashboardBlogPostsPage, () =>
-            canViewBlogPostsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Blog Posts",
-              icon: "fa-light fa-newspaper",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewBlogPostsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-blog-posts" }, name: "Blog Posts" },
-            ],
-          },
+      },
+      {
+        path: "/productions",
+        name: "productions",
+        component: restrictedComponent(
+          ProductionsView,
+          AbilityActions.Read,
+          AbilitySubjects.Production
+        ),
+        meta: {
+          layoutCssName: "plain-layout",
         },
-        {
-          path: "categories",
-          name: "dashboard-categories",
-          component: restrictedComponent(DashboardCategoriesPage, () =>
-            canViewCategoriesDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Categories",
-              icon: "fa-light fa-layer-group",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewCategoriesDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-categories" }, name: "Categories" },
-            ],
-          },
+      },
+      {
+        path: "/productions",
+        name: "productions",
+        component: ProductionsView,
+        meta: {
+          layoutCssName: "plain-layout",
         },
-        {
-          path: "contact-submissions",
-          name: "dashboard-contact-submissions",
-          component: restrictedComponent(DashboardContactSubmissionsPage, () =>
-            canViewContactSubmissionsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Contact Submissions",
-              icon: "fa-light fa-message-lines",
-              category: DashboardPageCategory.Admin,
-              visible: () => canViewContactSubmissionsDashboard(),
+      },
+      {
+        path: "/contact",
+        name: "contact",
+        component: restrictedComponent(
+          ContactView,
+          AbilityActions.Create,
+          AbilitySubjects.ContactSubmission
+        ),
+        meta: {
+          layoutCssName: "wave-layout",
+        },
+      },
+      {
+        path: "/login",
+        name: "login",
+        component: LoginView,
+        meta: {
+          layoutCssName: "wave-layout",
+        },
+      },
+      {
+        path: "/donate",
+        name: "donate",
+        component: DonateView,
+        meta: {
+          layoutCssName: "wave-layout",
+        },
+      },
+      {
+        path: "/join",
+        name: "join",
+        component: JoinView,
+        meta: {
+          layoutCssName: "wave-layout",
+        },
+      },
+      {
+        path: "/dashboard",
+        name: "dashboard-parent",
+        component: restrictedComponent(
+          DashboardView,
+          () => canViewDashboard().value
+        ),
+        meta: {
+          layoutCssName: "plain-layout",
+        },
+        children: [
+          {
+            path: "",
+            name: "dashboard",
+            component: restrictedComponent(
+              DashboardComingSoon,
+              () => canViewDashboard().value
+            ),
+            meta: {
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+              ],
             },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              {
-                route: { name: "dashboard-contact-submissions" },
+          },
+          {
+            path: "assets",
+            name: "dashboard-assets",
+            component: restrictedComponent(DashboardAssetsPage, () =>
+              canViewAssetsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Assets",
+                icon: "fa-light fa-box-open-full",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewAssetsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-assets" }, name: "Assets" },
+              ],
+            },
+          },
+          {
+            path: "blog-posts",
+            name: "dashboard-blog-posts",
+            component: restrictedComponent(DashboardBlogPostsPage, () =>
+              canViewBlogPostsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Blog Posts",
+                icon: "fa-light fa-newspaper",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewBlogPostsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-blog-posts" }, name: "Blog Posts" },
+              ],
+            },
+          },
+          {
+            path: "categories",
+            name: "dashboard-categories",
+            component: restrictedComponent(DashboardCategoriesPage, () =>
+              canViewCategoriesDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Categories",
+                icon: "fa-light fa-layer-group",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewCategoriesDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-categories" }, name: "Categories" },
+              ],
+            },
+          },
+          {
+            path: "contact-submissions",
+            name: "dashboard-contact-submissions",
+            component: restrictedComponent(
+              DashboardContactSubmissionsPage,
+              () => canViewContactSubmissionsDashboard()
+            ),
+            meta: {
+              sider: {
                 title: "Contact Submissions",
+                icon: "fa-light fa-message-lines",
+                category: DashboardPageCategory.Admin,
+                visible: () => canViewContactSubmissionsDashboard(),
               },
-            ],
-          },
-        },
-        {
-          path: "groups",
-          name: "dashboard-groups",
-          component: restrictedComponent(DashboardGroupsPage, () =>
-            canViewGroupsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Groups",
-              icon: "fa-light fa-users-line",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewGroupsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-groups" }, name: "Groups" },
-            ],
-          },
-        },
-        {
-          path: "images",
-          name: "dashboard-images",
-          component: restrictedComponent(DashboardImagesPage, () =>
-            canViewImagesDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Images",
-              icon: "fa-light fa-images",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewImagesDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-images" }, name: "Images" },
-            ],
-          },
-        },
-        {
-          path: "logs",
-          name: "dashboard-logs",
-          component: restrictedComponent(DashboardLogsPage, () =>
-            canViewLogsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Logs",
-              icon: "fa-light fa-clipboard-list",
-              category: DashboardPageCategory.Admin,
-              visible: () => canViewLogsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-logs" }, name: "Logs" },
-            ],
-          },
-        },
-        {
-          path: "people",
-          name: "dashboard-people",
-          component: restrictedComponent(DashboardPeoplePage, () =>
-            canViewPeopleDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "People",
-              icon: "fa-light fa-address-card",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewPeopleDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-people" }, name: "People" },
-            ],
-          },
-        },
-        {
-          path: "productions",
-          name: "dashboard-productions",
-          component: restrictedComponent(DashboardProductionsPage, () =>
-            canViewProductionsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Productions",
-              icon: "fa-light fa-clapperboard",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewProductionsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              {
-                route: { name: "dashboard-productions" },
-                title: "Productions",
-              },
-            ],
-          },
-        },
-        {
-          path: "redirects",
-          name: "dashboard-redirects",
-          component: restrictedComponent(DashboardRedirectsPage, () =>
-            canViewRedirectsDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Redirects",
-              icon: "fa-light fa-signs-post",
-              category: DashboardPageCategory.Admin,
-              visible: () => canViewRedirectsDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-redirects" }, name: "Redirects" },
-            ],
-          },
-        },
-        {
-          path: "roles",
-          name: "dashboard-roles",
-          component: restrictedComponent(DashboardRolesPage, () =>
-            canViewRolesDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Roles",
-              icon: "fa-light fa-badge-sheriff",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewRolesDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-roles" }, name: "Roles" },
-            ],
-          },
-        },
-        {
-          path: "stream",
-          name: "dashboard-stream",
-          component: restrictedComponent(DashboardStreamPage, () =>
-            canViewStreamDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Stream",
-              icon: "fa-light fa-signal-stream",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewStreamDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-stream" }, name: "Stream" },
-            ],
-          },
-        },
-        {
-          path: "users",
-          name: "dashboard-users",
-          component: restrictedComponent(DashboardUsersPage, () =>
-            canViewUsersDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Users",
-              icon: "fa-light fa-user",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewUsersDashboard(),
-            },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-users-list" }, name: "Users" },
-            ],
-          },
-          children: [
-            {
-              path: "",
-              name: "dashboard-users-list",
-              component: restrictedComponent(UserList, () =>
-                canViewUsersDashboard()
-              ),
-              meta: {
-                breadcrumb: () => [
-                  { route: { name: "dashboard" }, name: "Dashboard" },
-                  { route: { name: "dashboard-users-list" }, name: "Users" },
-                ],
-              },
-            },
-            {
-              path: "create",
-              name: "dashboard-user-create",
-              component: restrictedComponent(
-                h(CreateUserCard, {
-                  onSave: (id: string) =>
-                    router.push({
-                      name: "dashboard-user-details",
-                      params: { id },
-                    }),
-                }),
-                () => canViewUsersDashboard()
-              ),
-              meta: {
-                breadcrumb: () => [
-                  { route: { name: "dashboard" }, name: "Dashboard" },
-                  { route: { name: "dashboard-users-list" }, name: "Users" },
-                  { route: { name: "dashboard-usercreate" }, name: "Create" },
-                ],
-              },
-            },
-            {
-              path: ":id",
-              name: "dashboard-user-parent",
-              component: restrictedComponent(RouterView, () =>
-                canViewUsersDashboard()
-              ),
-              meta: {
-                breadcrumb: (route: RouteLocationNormalizedLoaded) => [
-                  { route: { name: "dashboard" }, name: "Dashboard" },
-                  { route: { name: "dashboard-users-list" }, name: "Users" },
-                  {
-                    route: { name: "dashboard-user-details" },
-                    name: `User ${route.params.id}`,
-                  },
-                ],
-              },
-              children: [
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
                 {
-                  path: "",
-                  name: "dashboard-user-details",
-                  component: restrictedComponent(DashboardUserPage, () =>
-                    canViewUsersDashboard()
-                  ),
-                  meta: {
-                    breadcrumb: (route: RouteLocationNormalizedLoaded) => [
-                      { route: { name: "dashboard" }, name: "Dashboard" },
-                      {
-                        route: { name: "dashboard-users-list" },
-                        name: "Users",
-                      },
-                      {
-                        route: { name: "dashboard-user-details" },
-                        name: `User ${route.params.id}`,
-                      },
-                    ],
-                  },
-                },
-                {
-                  path: "edit",
-                  name: "dashboard-user-details-edit",
-                  component: restrictedComponent(DashboardEditUserPage, () =>
-                    canViewUsersDashboard()
-                  ),
-                  meta: {
-                    breadcrumb: (route: RouteLocationNormalizedLoaded) => [
-                      { route: { name: "dashboard" }, name: "Dashboard" },
-                      {
-                        route: { name: "dashboard-users-list" },
-                        name: "Users",
-                      },
-                      {
-                        route: { name: "dashboard-user-details" },
-                        name: `User ${route.params.id}`,
-                      },
-                      {
-                        route: { name: "dashboard-user-details-edit" },
-                        name: "Edit",
-                      },
-                    ],
-                  },
-                },
-                {
-                  path: "change-password",
-                  name: "dashboard-user-details-change-password",
-                  component: restrictedComponent(ChangePasswordCard, () =>
-                    canViewUsersDashboard()
-                  ),
-                  meta: {
-                    breadcrumb: (route: RouteLocationNormalizedLoaded) => [
-                      { route: { name: "dashboard" }, name: "Dashboard" },
-                      {
-                        route: { name: "dashboard-users-list" },
-                        name: "Users",
-                      },
-                      {
-                        route: { name: "dashboard-user-details" },
-                        name: `User ${route.params.id}`,
-                      },
-                      {
-                        route: {
-                          name: "dashboard-user-details-change-password",
-                        },
-                        name: "Change Password",
-                      },
-                    ],
-                  },
+                  route: { name: "dashboard-contact-submissions" },
+                  title: "Contact Submissions",
                 },
               ],
             },
-          ],
-        },
-        {
-          path: "videos",
-          name: "dashboard-videos",
-          component: restrictedComponent(DashboardVideosPage, () =>
-            canViewVideosDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Videos",
-              icon: "fa-light fa-video",
-              category: DashboardPageCategory.Content,
-              visible: () => canViewVideosDashboard(),
+          },
+          {
+            path: "groups",
+            name: "dashboard-groups",
+            component: restrictedComponent(DashboardGroupsPage, () =>
+              canViewGroupsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Groups",
+                icon: "fa-light fa-users-line",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewGroupsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-groups" }, name: "Groups" },
+              ],
             },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-videos" }, name: "Videos" },
+          },
+          {
+            path: "images",
+            name: "dashboard-images",
+            component: restrictedComponent(DashboardImagesPage, () =>
+              canViewImagesDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Images",
+                icon: "fa-light fa-images",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewImagesDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-images" }, name: "Images" },
+              ],
+            },
+          },
+          {
+            path: "logs",
+            name: "dashboard-logs",
+            component: restrictedComponent(DashboardLogsPage, () =>
+              canViewLogsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Logs",
+                icon: "fa-light fa-clipboard-list",
+                category: DashboardPageCategory.Admin,
+                visible: () => canViewLogsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-logs" }, name: "Logs" },
+              ],
+            },
+          },
+          {
+            path: "people",
+            name: "dashboard-people",
+            component: restrictedComponent(DashboardPeoplePage, () =>
+              canViewPeopleDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "People",
+                icon: "fa-light fa-address-card",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewPeopleDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-people" }, name: "People" },
+              ],
+            },
+          },
+          {
+            path: "productions",
+            name: "dashboard-productions",
+            component: restrictedComponent(DashboardProductionsPage, () =>
+              canViewProductionsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Productions",
+                icon: "fa-light fa-clapperboard",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewProductionsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                {
+                  route: { name: "dashboard-productions" },
+                  title: "Productions",
+                },
+              ],
+            },
+          },
+          {
+            path: "redirects",
+            name: "dashboard-redirects",
+            component: restrictedComponent(DashboardRedirectsPage, () =>
+              canViewRedirectsDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Redirects",
+                icon: "fa-light fa-signs-post",
+                category: DashboardPageCategory.Admin,
+                visible: () => canViewRedirectsDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-redirects" }, name: "Redirects" },
+              ],
+            },
+          },
+          {
+            path: "roles",
+            name: "dashboard-roles",
+            component: restrictedComponent(DashboardRolesPage, () =>
+              canViewRolesDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Roles",
+                icon: "fa-light fa-badge-sheriff",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewRolesDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-roles" }, name: "Roles" },
+              ],
+            },
+          },
+          {
+            path: "stream",
+            name: "dashboard-stream",
+            component: restrictedComponent(DashboardStreamPage, () =>
+              canViewStreamDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Stream",
+                icon: "fa-light fa-signal-stream",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewStreamDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-stream" }, name: "Stream" },
+              ],
+            },
+          },
+          {
+            path: "users",
+            name: "dashboard-users-parent",
+            component: restrictedComponent(DashboardUsersPage, () =>
+              canViewUsersDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Users",
+                icon: "fa-light fa-user",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewUsersDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-users" }, name: "Users" },
+              ],
+            },
+            children: [
+              {
+                path: "",
+                name: "dashboard-users",
+                // User list is rendered in the parent. Render an empty div.
+                component: restrictedComponent(h("div"), () =>
+                  canViewUsersDashboard()
+                ),
+                meta: {
+                  breadcrumb: () => [
+                    { route: { name: "dashboard" }, name: "Dashboard" },
+                    { route: { name: "dashboard-users" }, name: "Users" },
+                  ],
+                },
+              },
+              {
+                path: "create",
+                name: "dashboard-user-create",
+                component: restrictedComponent(
+                  h(CreateUserCard, {
+                    onSave: (id: string) =>
+                      router.push({
+                        name: "dashboard-user-details",
+                        params: { id },
+                      }),
+                  }),
+                  () => canViewUsersDashboard()
+                ),
+                meta: {
+                  breadcrumb: () => [
+                    { route: { name: "dashboard" }, name: "Dashboard" },
+                    { route: { name: "dashboard-users" }, name: "Users" },
+                    {
+                      route: { name: "dashboard-user-create" },
+                      name: "Create",
+                    },
+                  ],
+                },
+              },
+              {
+                path: ":id",
+                name: "dashboard-user-parent",
+                component: restrictedComponent(RouterView, () =>
+                  canViewUsersDashboard()
+                ),
+                meta: {
+                  breadcrumb: (route: RouteLocationNormalizedLoaded) => [
+                    { route: { name: "dashboard" }, name: "Dashboard" },
+                    { route: { name: "dashboard-users" }, name: "Users" },
+                    {
+                      route: { name: "dashboard-user-details" },
+                      name: `User ${route.params.id}`,
+                    },
+                  ],
+                },
+                children: [
+                  {
+                    path: "",
+                    name: "dashboard-user-details",
+                    component: restrictedComponent(UserDetailsCard, () =>
+                      canViewUsersDashboard()
+                    ),
+                    props: (route) => ({
+                      userId: BigInt(route.params.id.toString()),
+                    }),
+                    meta: {
+                      breadcrumb: (route: RouteLocationNormalizedLoaded) => [
+                        { route: { name: "dashboard" }, name: "Dashboard" },
+                        {
+                          route: { name: "dashboard-users" },
+                          name: "Users",
+                        },
+                        {
+                          route: { name: "dashboard-user-details" },
+                          name: `User ${route.params.id}`,
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    path: "edit",
+                    name: "dashboard-user-details-edit",
+                    component: restrictedComponent(UserInputCard, () =>
+                      canViewUsersDashboard()
+                    ),
+                    props: (route) => ({
+                      userId: BigInt(route.params.id.toString()),
+                      closable: () => {
+                        const routeStore = useRouteStore();
+                        return routeStore.hasSwitchedRoutes;
+                      },
+                      onClose: () => {
+                        useRouteStore().goToParent();
+                      },
+                    }),
+                    meta: {
+                      breadcrumb: (route: RouteLocationNormalizedLoaded) => [
+                        { route: { name: "dashboard" }, name: "Dashboard" },
+                        {
+                          route: { name: "dashboard-users" },
+                          name: "Users",
+                        },
+                        {
+                          route: { name: "dashboard-user-details" },
+                          name: `User ${route.params.id}`,
+                        },
+                        {
+                          route: {
+                            name: "dashboard-user-details-edit",
+                            params: { id: route.params.id },
+                          },
+                          name: "Edit",
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    path: "change-password",
+                    name: "dashboard-user-details-change-password",
+                    component: restrictedComponent(ChangePasswordCard, () =>
+                      canViewUsersDashboard()
+                    ),
+                    props: (route) => ({
+                      userId: BigInt(route.params.id.toString()),
+                      closable: () => {
+                        const routeStore = useRouteStore();
+                        return routeStore.hasSwitchedRoutes;
+                      },
+                      onClose: () => {
+                        useRouteStore().goToParent();
+                      },
+                    }),
+                    meta: {
+                      breadcrumb: (route: RouteLocationNormalizedLoaded) => [
+                        { route: { name: "dashboard" }, name: "Dashboard" },
+                        {
+                          route: { name: "dashboard-users" },
+                          name: "Users",
+                        },
+                        {
+                          route: { name: "dashboard-user-details" },
+                          name: `User ${route.params.id}`,
+                        },
+                        {
+                          route: {
+                            name: "dashboard-user-details-change-password",
+                          },
+                          name: "Change Password",
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    path: "permissions",
+                    name: "dashboard-user-details-permissions",
+                    component: restrictedComponent(UserPermissionsEditor, () =>
+                      canViewUsersDashboard()
+                    ),
+                    props: (route) => ({
+                      userId: BigInt(route.params.id.toString()),
+                      closable: () => {
+                        const routeStore = useRouteStore();
+                        return routeStore.hasSwitchedRoutes;
+                      },
+                      onClose: () => {
+                        useRouteStore().goToParent();
+                      },
+                    }),
+                    meta: {
+                      breadcrumb: (route: RouteLocationNormalizedLoaded) => [
+                        { route: { name: "dashboard" }, name: "Dashboard" },
+                        {
+                          route: { name: "dashboard-users" },
+                          name: "Users",
+                        },
+                        {
+                          route: { name: "dashboard-user-details" },
+                          name: `User ${route.params.id}`,
+                        },
+                        {
+                          route: {
+                            name: "dashboard-user-details-edit",
+                            params: { id: route.params.id },
+                          },
+                          name: "Edit",
+                        },
+                        {
+                          route: {
+                            name: "dashboard-user-details-permissions",
+                          },
+                          name: "Permissions",
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
             ],
           },
-        },
-        {
-          path: "votes",
-          name: "dashboard-votes",
-          component: restrictedComponent(DashboardVotesPage, () =>
-            canViewVotesDashboard()
-          ),
-          meta: {
-            sider: {
-              title: "Votes",
-              icon: "fa-light fa-ballot-check",
-              category: DashboardPageCategory.Organization,
-              visible: () => canViewVotesDashboard(),
+          {
+            path: "videos",
+            name: "dashboard-videos",
+            component: restrictedComponent(DashboardVideosPage, () =>
+              canViewVideosDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Videos",
+                icon: "fa-light fa-video",
+                category: DashboardPageCategory.Content,
+                visible: () => canViewVideosDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-videos" }, name: "Videos" },
+              ],
             },
-            breadcrumb: () => [
-              { route: { name: "dashboard" }, name: "Dashboard" },
-              { route: { name: "dashboard-votes" }, name: "Votes" },
-            ],
           },
+          {
+            path: "votes",
+            name: "dashboard-votes",
+            component: restrictedComponent(DashboardVotesPage, () =>
+              canViewVotesDashboard()
+            ),
+            meta: {
+              sider: {
+                title: "Votes",
+                icon: "fa-light fa-ballot-check",
+                category: DashboardPageCategory.Organization,
+                visible: () => canViewVotesDashboard(),
+              },
+              breadcrumb: () => [
+                { route: { name: "dashboard" }, name: "Dashboard" },
+                { route: { name: "dashboard-votes" }, name: "Votes" },
+              ],
+            },
+          },
+        ],
+      },
+      {
+        path: "/account",
+        name: "account",
+        component: restrictedComponent(AccountView, () => {
+          const auth = useAuthStore();
+          return auth.isLoggedIn;
+        }),
+        meta: {
+          layoutCssName: "wave-layout",
         },
-      ],
-    },
-    {
-      path: "/account",
-      name: "account",
-      component: restrictedComponent(AccountView, () => {
-        const auth = useAuthStore();
-        return auth.isLoggedIn;
-      }),
-      meta: {
-        layoutCssName: "wave-layout",
       },
-    },
-    {
-      path: "/:pathMatch(.*)*",
-      name: "404",
-      component: NotFoundView,
-      meta: {
-        layoutCssName: "plain-layout",
+      {
+        path: "/:pathMatch(.*)*",
+        name: "404",
+        component: NotFoundView,
+        meta: {
+          layoutCssName: "plain-layout",
+        },
       },
-    },
-  ],
-});
+    ],
+  });
 
-export default router;
+  return router;
+}

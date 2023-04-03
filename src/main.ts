@@ -95,10 +95,10 @@ library.add(faTwitter);
 library.add(faRedditAlien);
 
 import App from "./App.vue";
-import router from "./router";
 import { apolloClient } from "./apollo";
 import { abilitiesPlugin } from "@casl/vue";
 import { ability } from "@/casl";
+import { instantiateRouter } from "@/router";
 
 const apolloProvider = createApolloProvider({
   defaultClient: apolloClient,
@@ -113,7 +113,7 @@ const app = createApp({
 
 app.use(abilitiesPlugin, ability);
 app.use(createPinia());
-app.use(router);
+app.use(instantiateRouter());
 app.use(apolloProvider);
 app.component("font-awesome-icon", FontAwesomeIcon);
 

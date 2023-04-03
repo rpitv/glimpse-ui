@@ -1,102 +1,104 @@
 <template>
-  <n-card class="create-user-card">
-    <h1>Create User</h1>
-    <div class="steps">
-      <n-steps :current="currentStep">
-        <n-step
-          v-for="step of steps"
-          :key="step.title"
-          :title="step.title"
-          :description="step.description"
-        />
-      </n-steps>
-    </div>
-
-    <div class="step">
-      <Transition name="steps">
-        <div v-if="currentStep === 1">
-          <UserDetailsInput v-model:data="userData" ref="userDetailsInput" />
-        </div>
-        <div v-else-if="currentStep === 2">
-          <n-tag
-            class="group-tag"
-            v-for="group of groupsToAdd"
-            closable
-            @close="removeGroup(group)"
-            >{{ group.name }} (ID {{ group.id }})</n-tag
-          >
-          <GroupSearch @select="addGroup" :disabled-groups="groupsToAdd" />
-        </div>
-        <div v-else-if="currentStep === 3">
-          <PermissionsEditor
-            :save-required="false"
-            :count="permissionsToAdd.length"
-            v-model:permissions="permissionsToAdd"
+  <RouterPopup :max-width="1100">
+    <n-card class="create-user-card">
+      <h1>Create User</h1>
+      <div class="steps">
+        <n-steps :current="currentStep">
+          <n-step
+            v-for="step of steps"
+            :key="step.title"
+            :title="step.title"
+            :description="step.description"
           />
-        </div>
-        <div v-else-if="currentStep === 4">
-          <p class="center-text-info">Coming Soon</p>
-        </div>
-        <div v-else-if="currentStep === 5">
-          <n-grid cols="1 s:2 m:4" responsive="screen">
-            <n-grid-item>
-              <h2>User Details</h2>
-              <p>Username: {{ userData.username }}</p>
-              <p>Email: {{ userData.mail }}</p>
-              <p>Discord ID: {{ userData.discord ?? "None" }}</p>
-            </n-grid-item>
-            <n-grid-item>
-              <h2>Groups</h2>
-              <p>{{ groupsToAdd.length }} groups</p>
-              <ul>
-                <li v-for="group of groupsToAdd" :key="group.id">
-                  {{ group.name }} (ID {{ group.id }})
-                </li>
-              </ul>
-            </n-grid-item>
-            <n-grid-item>
-              <h2>Permissions</h2>
-              <p>{{ permissionsToAdd.length }} permissions</p>
-              <n-button @click="currentStep = 3">View</n-button>
-            </n-grid-item>
-            <n-grid-item>
-              <h2>Profile</h2>
-              <p>Coming Soon</p>
-            </n-grid-item>
-          </n-grid>
-        </div>
-        <div v-else-if="currentStep === steps.length + 1">
-          <n-alert v-if="error" type="error">
-            {{ error }}
-          </n-alert>
-          <p v-else class="center-text-info">Creating user...</p>
-        </div>
-      </Transition>
-    </div>
+        </n-steps>
+      </div>
 
-    <div class="actions">
-      <n-button
-        v-if="closable"
-        class="action"
-        @click="emit('close')"
-        type="error"
-        :disabled="currentStep > steps.length && !error"
-      >
-        Cancel
-      </n-button>
-      <n-button
-        class="action"
-        v-if="currentStep > 1"
-        @click="currentStep--"
-        :disabled="currentStep > steps.length && !error"
-      >
-        Back
-      </n-button>
-      <n-button class="action" @click="nextStep" :disabled="!canContinue">
-        {{ currentStep >= steps.length ? "Create User" : "Continue" }}
-      </n-button>
-    </div>
-  </n-card>
+      <div class="step">
+        <Transition name="steps">
+          <div v-if="currentStep === 1">
+            <UserDetailsInput v-model:data="userData" ref="userDetailsInput" />
+          </div>
+          <div v-else-if="currentStep === 2">
+            <n-tag
+              class="group-tag"
+              v-for="group of groupsToAdd"
+              closable
+              @close="removeGroup(group)"
+              >{{ group.name }} (ID {{ group.id }})</n-tag
+            >
+            <GroupSearch @select="addGroup" :disabled-groups="groupsToAdd" />
+          </div>
+          <div v-else-if="currentStep === 3">
+            <PermissionsEditor
+              :save-required="false"
+              :count="permissionsToAdd.length"
+              v-model:permissions="permissionsToAdd"
+            />
+          </div>
+          <div v-else-if="currentStep === 4">
+            <p class="center-text-info">Coming Soon</p>
+          </div>
+          <div v-else-if="currentStep === 5">
+            <n-grid cols="1 s:2 m:4" responsive="screen">
+              <n-grid-item>
+                <h2>User Details</h2>
+                <p>Username: {{ userData.username }}</p>
+                <p>Email: {{ userData.mail }}</p>
+                <p>Discord ID: {{ userData.discord ?? "None" }}</p>
+              </n-grid-item>
+              <n-grid-item>
+                <h2>Groups</h2>
+                <p>{{ groupsToAdd.length }} groups</p>
+                <ul>
+                  <li v-for="group of groupsToAdd" :key="group.id">
+                    {{ group.name }} (ID {{ group.id }})
+                  </li>
+                </ul>
+              </n-grid-item>
+              <n-grid-item>
+                <h2>Permissions</h2>
+                <p>{{ permissionsToAdd.length }} permissions</p>
+                <n-button @click="currentStep = 3">View</n-button>
+              </n-grid-item>
+              <n-grid-item>
+                <h2>Profile</h2>
+                <p>Coming Soon</p>
+              </n-grid-item>
+            </n-grid>
+          </div>
+          <div v-else-if="currentStep === steps.length + 1">
+            <n-alert v-if="error" type="error">
+              {{ error }}
+            </n-alert>
+            <p v-else class="center-text-info">Creating user...</p>
+          </div>
+        </Transition>
+      </div>
+
+      <div class="actions">
+        <n-button
+          v-if="closable"
+          class="action"
+          @click="emit('close')"
+          type="error"
+          :disabled="currentStep > steps.length && !error"
+        >
+          Cancel
+        </n-button>
+        <n-button
+          class="action"
+          v-if="currentStep > 1"
+          @click="currentStep--"
+          :disabled="currentStep > steps.length && !error"
+        >
+          Back
+        </n-button>
+        <n-button class="action" @click="nextStep" :disabled="!canContinue">
+          {{ currentStep >= steps.length ? "Create User" : "Continue" }}
+        </n-button>
+      </div>
+    </n-card>
+  </RouterPopup>
 </template>
 
 <script setup lang="ts">
@@ -122,6 +124,7 @@ import {
 } from "@/graphql/types";
 import { useRouter } from "vue-router";
 import PermissionsEditor from "@/components/util/permissions/PermissionsEditor.vue";
+import RouterPopup from "@/components/util/RouterPopup.vue";
 
 const router = useRouter();
 const createUserMutation = useMutation(CreateUserDocument);

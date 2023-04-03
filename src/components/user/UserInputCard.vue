@@ -1,98 +1,97 @@
 <template>
-  <div class="card-wrapper">
-    <n-card class="card">
-      <div v-if="sourceData.loading.value">Loading...</div>
-      <div v-else-if="loadingError">
-        {{ loadingError }}
-      </div>
-      <div v-else>
-        <h1>Edit User {{ id }}</h1>
+  <RouterPopup :max-width="900">
+    <div class="card-wrapper">
+      <n-card class="card">
+        <div v-if="sourceData.loading.value">Loading...</div>
+        <div v-else-if="loadingError">
+          {{ loadingError }}
+        </div>
+        <div v-else>
+          <h1>Edit User {{ userId }}</h1>
 
-        <UserDetailsInput v-model:data="inputUser" ref="userDetailsInput" />
-        <div>
-          <h2>Groups</h2>
-          <n-tag
-            class="group-tag"
-            type="primary"
-            closable
-            v-for="userGroup of currentUserGroups"
-            @close="removeUserGroup(userGroup)"
-          >
-            <RouterLink
-              to="{ name: 'dashboard-groups', params: { id: group.id }}"
-            >
-              {{ userGroup.group?.name }} (ID {{ userGroup.group?.id }})
-            </RouterLink>
-          </n-tag>
-          <n-tag
-            class="group-tag deleted"
-            closable
-            v-for="userGroup of userGroupsToBeDeleted"
-            @close="removeUserGroup(userGroup)"
-          >
-            <RouterLink
-              to="{ name: 'dashboard-groups', params: { id: group.id }}"
-            >
-              {{ userGroup.group?.name }} (ID {{ userGroup.group?.id }})
-            </RouterLink>
-          </n-tag>
-          <n-tag
-            class="group-tag added"
-            type="info"
-            closable
-            v-for="group of groupsToBeAdded"
-            @close="removeAddedGroup(group)"
-          >
-            <RouterLink
-              to="{ name: 'dashboard-groups', params: { id: group.id }}"
-            >
-              {{ group.name }} (ID {{ group.id }})
-            </RouterLink>
-          </n-tag>
-          <GroupSearch
-            @select="groupSelected"
-            :disabled-groups="currentUserGroups"
-          />
-        </div>
-        <div>
-          <h2>Permissions</h2>
-          <RouterPopup v-model="confirmPermissionsEditor" :max-width="1000">
-            <UserPermissionsEditor
-              ref="editor"
-              :user-id="id"
+          <UserDetailsInput v-model:data="inputUser" ref="userDetailsInput" />
+          <div>
+            <h2>Groups</h2>
+            <n-tag
+              class="group-tag"
+              type="primary"
               closable
-              @close="confirmPermissionsEditor = false"
+              v-for="userGroup of currentUserGroups"
+              @close="removeUserGroup(userGroup)"
+            >
+              <RouterLink
+                to="{ name: 'dashboard-groups', params: { id: group.id }}"
+              >
+                {{ userGroup.group?.name }} (ID {{ userGroup.group?.id }})
+              </RouterLink>
+            </n-tag>
+            <n-tag
+              class="group-tag deleted"
+              closable
+              v-for="userGroup of userGroupsToBeDeleted"
+              @close="removeUserGroup(userGroup)"
+            >
+              <RouterLink
+                to="{ name: 'dashboard-groups', params: { id: group.id }}"
+              >
+                {{ userGroup.group?.name }} (ID {{ userGroup.group?.id }})
+              </RouterLink>
+            </n-tag>
+            <n-tag
+              class="group-tag added"
+              type="info"
+              closable
+              v-for="group of groupsToBeAdded"
+              @close="removeAddedGroup(group)"
+            >
+              <RouterLink
+                to="{ name: 'dashboard-groups', params: { id: group.id }}"
+              >
+                {{ group.name }} (ID {{ group.id }})
+              </RouterLink>
+            </n-tag>
+            <GroupSearch
+              @select="groupSelected"
+              :disabled-groups="currentUserGroups"
             />
-            <template #trigger>
+          </div>
+          <div>
+            <h2>Permissions</h2>
+            <RouterLink
+              :to="{
+                name: 'dashboard-user-details-permissions',
+                params: { id: userId },
+              }"
+            >
               <n-button type="primary">Open Permissions Editor</n-button>
-            </template>
-          </RouterPopup>
+            </RouterLink>
+          </div>
+          <div>
+            <h2>Profile</h2>
+            <p>Coming soon</p>
+          </div>
+          <div class="actions">
+            <n-button
+              :disabled="!userDetailsInput?.isValid || submitting"
+              @click="save"
+              class="action"
+              type="success"
+            >
+              {{ submitting ? "Saving..." : "Save" }}
+            </n-button>
+            <n-button
+              class="action"
+              v-if="typeof closable === 'function' ? closable() : closable"
+              @click="emit('close')"
+              type="error"
+            >
+              Cancel
+            </n-button>
+          </div>
         </div>
-        <div>
-          <h2>Profile</h2>
-          <p>Coming soon</p>
-        </div>
-        <div class="actions">
-          <n-button
-            :disabled="!userDetailsInput?.isValid || submitting"
-            @click="save"
-            class="action"
-            type="success"
-          >
-            {{ submitting ? "Saving..." : "Save" }}
-          </n-button>
-          <n-button
-            class="action"
-            v-if="closable"
-            @click="emit('close')"
-            type="error"
-          >
-            Cancel
-          </n-button>
-        </div>
-      </div>
-    </n-card>
-  </div>
+      </n-card>
+    </div>
+  </RouterPopup>
 </template>
 
 <script setup lang="ts">
@@ -115,12 +114,12 @@ import RouterPopup from "@/components/util/RouterPopup.vue";
 import UserPermissionsEditor from "@/components/user/UserPermissionsEditor.vue";
 
 const props = defineProps({
-  id: {
+  userId: {
     type: BigInt as unknown as PropType<BigInt>,
     required: true,
   },
   closable: {
-    type: Boolean,
+    type: [Function, Boolean] as PropType<boolean | (() => boolean)>,
     default: false,
   },
 });
@@ -129,7 +128,7 @@ const emit = defineEmits(["save", "close"]);
 
 const dialog = useDialog();
 
-const sourceData = useQuery(UserDetailsDocument, { id: props.id });
+const sourceData = useQuery(UserDetailsDocument, { id: props.userId });
 const updateUserMutation = useMutation(UpdateUserDocument);
 const createUserGroupMutation = useMutation(CreateUserGroupDocument);
 const deleteUserGroupMutation = useMutation(DeleteUserGroupDocument);

@@ -1,20 +1,22 @@
 <template>
-  <div class="spinner-wrapper" v-if="userPermissionsQuery.loading.value">
-    <n-spin>
-      <template #description>
-        <span>Loading...</span>
-      </template>
-    </n-spin>
-  </div>
-  <div v-else>
-    <PermissionsEditor
-      ref="editor"
-      v-model:permissions="computedPermissions"
-      :count="userPermissionsQuery.result.value?.userPermissionCount"
-      :closable="closable"
-      @close="emit('close')"
-    />
-  </div>
+  <RouterPopup :max-width="1000">
+    <div class="spinner-wrapper" v-if="userPermissionsQuery.loading.value">
+      <n-spin>
+        <template #description>
+          <span>Loading...</span>
+        </template>
+      </n-spin>
+    </div>
+    <div v-else>
+      <PermissionsEditor
+        ref="editor"
+        v-model:permissions="computedPermissions"
+        :count="userPermissionsQuery.result.value?.userPermissionCount"
+        :closable="typeof closable === 'function' ? closable() : closable"
+        @close="emit('close')"
+      />
+    </div>
+  </RouterPopup>
 </template>
 
 <script setup lang="ts">
@@ -29,6 +31,7 @@ import {
 } from "@/graphql/types";
 import PermissionsEditor from "@/components/util/permissions/PermissionsEditor.vue";
 import { computed, ref } from "vue";
+import RouterPopup from "@/components/util/RouterPopup.vue";
 
 const props = defineProps({
   userId: {
@@ -36,7 +39,7 @@ const props = defineProps({
     required: true,
   },
   closable: {
-    type: Boolean,
+    type: [Function, Boolean] as PropType<boolean | (() => boolean)>,
   },
 });
 

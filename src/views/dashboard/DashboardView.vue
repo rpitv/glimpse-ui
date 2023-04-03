@@ -1,10 +1,8 @@
 <template>
   <div class="dashboard-view">
     <n-card>
-
       <n-layout has-sider>
         <n-layout-sider
-
           bordered
           collapse-mode="width"
           :collapsed-width="64"
@@ -13,14 +11,11 @@
           show-trigger
           @collapse="menuCollapsed = true"
           @expand="menuCollapsed = false"
-          >
-            <n-menu
-              :options="menuOptions"
-              @update:value="menuOptionClicked"
-            />
+        >
+          <n-menu :options="menuOptions" @update:value="menuOptionClicked" />
         </n-layout-sider>
         <n-layout class="page-content">
-          <DashboardBreadcrumb :route="breadcrumbRoute"/>
+          <RouterBreadcrumb />
           <router-view v-slot="{ Component }">
             <component :is="Component" />
           </router-view>
@@ -37,7 +32,7 @@ import { computed, h, ref } from "vue";
 import { RouteRecordRaw, RouterLink, useRoute, useRouter } from "vue-router";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { DashboardPageCategory, DashboardPageMetadata } from "@/util";
-import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb.vue";
+import RouterBreadcrumb from "@/components/util/RouterBreadcrumb.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,16 +40,16 @@ const router = useRouter();
 const categoryOrder = [
   DashboardPageCategory.Content,
   DashboardPageCategory.Organization,
-  DashboardPageCategory.Admin
+  DashboardPageCategory.Admin,
 ];
 
 function generateOptionComponent(route: RouteRecordRaw) {
   const routeMeta = route.meta?.sider as DashboardPageMetadata;
 
   let toRouteName = route.name;
-  if(route.children && route.children?.length > 0) {
-    const emptyPathChild = route.children.find(c => c.path === "");
-    if(emptyPathChild) {
+  if (route.children && route.children?.length > 0) {
+    const emptyPathChild = route.children.find((c) => c.path === "");
+    if (emptyPathChild) {
       toRouteName = emptyPathChild.name;
     }
   }
@@ -65,35 +60,37 @@ function generateOptionComponent(route: RouteRecordRaw) {
         RouterLink,
         { to: { name: toRouteName } },
         {
-          default: () => routeMeta.title ?? toRouteName
+          default: () => routeMeta.title ?? toRouteName,
         }
-      )
+      );
     },
     key: `${String(toRouteName)}`,
     icon: () => {
-      return h(FontAwesomeIcon, { icon: routeMeta.icon })
-    }
-  }
+      return h(FontAwesomeIcon, { icon: routeMeta.icon });
+    },
+  };
 }
 
 const menuOptions = computed<MenuOption[]>(() => {
-  const childrenRoutes = router.getRoutes().find(r => r.name === "dashboard-parent")?.children;
-  if(!childrenRoutes) {
+  const childrenRoutes = router
+    .getRoutes()
+    .find((r) => r.name === "dashboard-parent")?.children;
+  if (!childrenRoutes) {
     return [];
   }
 
   const categories: Map<DashboardPageCategory, MenuOption[]> = new Map();
 
-  for(const route of childrenRoutes) {
-    const routeMeta: DashboardPageMetadata = route.meta?.sider as any ?? {};
+  for (const route of childrenRoutes) {
+    const routeMeta: DashboardPageMetadata = (route.meta?.sider as any) ?? {};
 
-    if(!routeMeta.visible?.()) {
+    if (!routeMeta.visible?.()) {
       continue;
     }
 
     const category = routeMeta.category ?? DashboardPageCategory.Organization;
     const categoryEntries = categories.get(category);
-    if(categoryEntries) {
+    if (categoryEntries) {
       categoryEntries.push(generateOptionComponent(route));
     } else {
       categories.set(category, [generateOptionComponent(route)]);
@@ -102,18 +99,18 @@ const menuOptions = computed<MenuOption[]>(() => {
 
   const options: MenuOption[] = [];
 
-  for(let i = 0; i < categoryOrder.length; i++) {
+  for (let i = 0; i < categoryOrder.length; i++) {
     const categoryName = categoryOrder[i];
     const nextCategoryName = categoryOrder[i + 1];
     const categoryOptions = categories.get(categoryName);
-    if(categoryOptions) {
+    if (categoryOptions) {
       options.push(...categoryOptions);
 
-      if(categoryOptions.length && categories.get(nextCategoryName)?.length ) {
+      if (categoryOptions.length && categories.get(nextCategoryName)?.length) {
         options.push({
           key: `divider:${categoryName}:${nextCategoryName}`,
-          type: 'divider'
-        })
+          type: "divider",
+        });
       }
     }
   }
@@ -121,21 +118,12 @@ const menuOptions = computed<MenuOption[]>(() => {
   return options;
 });
 
-const breadcrumbRoute = computed(() => {
-  const breadcrumb = route.meta?.breadcrumb;
-  if(typeof breadcrumb === "function") {
-    return breadcrumb(route);
-  } else if(typeof breadcrumb === "string") {
-    return breadcrumb;
-  }
-})
-
 function menuOptionClicked(key: string) {
-  if(key.includes("divider")) {
+  if (key.includes("divider")) {
     return;
   }
-  const route = key.split(':').pop();
-  if(!route) {
+  const route = key.split(":").pop();
+  if (!route) {
     return;
   }
   router.push({ name: key });
@@ -159,5 +147,4 @@ const menuCollapsed = ref<boolean>(true);
 .page-content {
   padding: 2rem;
 }
-
 </style>
