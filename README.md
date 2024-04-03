@@ -1,3 +1,7 @@
+# Notice: This project has been relocated to the [rpitv/glimpse](https://github.com/rpitv/glimpse) monorepo
+
+---
+
 # Glimpse UI
 
 <img src="https://imgur.com/dmZSyhe.png" width="200px" alt="RPI TV Glimpse Logo" />
